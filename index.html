@@ -324,7 +324,7 @@
             loadPosts().then(posts => {
                 const post = posts.find(p => p.slug === slug);
                 if (post) {
-                    location.hash = `#post/${slug}`;
+                    history.pushState({ slug: slug }, '', `/post/${slug}`);
                     // Скрываем left aside для 2 колонок (контент слева + right trending справа)
                     document.querySelector('aside:first-of-type').classList.add('hidden');
                     // Расширяем центр
@@ -387,7 +387,7 @@
             mainContent.classList.add('max-w-[600px]');
             mainContent.classList.remove('max-w-none', 'border-r-0');
 
-            location.hash = '';
+            history.pushState({}, '', '/');
             renderFeed();
             renderTrending();
         }
@@ -403,12 +403,19 @@
 
         // Инит
         window.addEventListener('load', () => {
-            renderFeed();
-            renderTrending();
+            if (location.pathname.startsWith('/post/')) {
+                const slug = location.pathname.substring(6);
+                viewPost(slug);
+            } else {
+                renderFeed();
+                renderTrending();
+            }
         });
-        window.addEventListener('hashchange', () => {
-            if (location.hash.startsWith('#post/')) {
-                viewPost(location.hash.substring(6));
+
+        window.addEventListener('popstate', () => {  // Для back/forward кнопок браузера
+            if (location.pathname.startsWith('/post/')) {
+                const slug = location.pathname.substring(6);
+                viewPost(slug);
             } else {
                 showHome();
             }

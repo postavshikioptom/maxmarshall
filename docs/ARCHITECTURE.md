@@ -658,3 +658,11 @@ The architecture is now fully defined. This plan ensures that the "child" site r
 Есть стилизованная кнопка "Назад".
 Контент статьи рендерится через Markdown с улучшенной типографикой.
 
+**Задача 2.4: Чистый URL у постов через slug **
+Добавь файл .htaccess в корень сайта (на indevs.in по FTP, рядом с index.html):textRewriteEngine On
+```
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ /index.html [L,QSA]Это направит все запросы (типа /post/slug) на index.html, без перезагрузки сервера.
+```
+
