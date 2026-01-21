@@ -65,7 +65,7 @@ The architecture is now fully defined. This plan ensures that the "child" site r
 
 Что нужно сделать дальше?
 ===========
-# ФАЗА 2: Код подгурзки постов с Decamp CMS
+# ФАЗА 2: Код подгурзки постов с Decamp CMS ✅ ЗАВЕРШЕНО
 # Обновлённый Подробный План Реализации Интеграции Decap CMS с Дочерним Сайтом (maxmarshall.indevs.in)
 
 Этот план для другой AI-модели кодера. Основан на репозитории https://github.com/postavshikioptom/maxmarshall (файлы: index.html — главная лента, post.html — шаблон детального поста, примеры сгенерированных файлов). Всё на vanilla HTML/JS, Tailwind CDN, без фреймворков/npm/серверов.
@@ -84,7 +84,7 @@ The architecture is now fully defined. This plan ensures that the "child" site r
 - Кэш: localStorage (24 часа).
 - SEO: Динамически обновлять <title>, <meta description>, og:tags в JS.
 
-✅ ЗАВЕРШЕНО **Задача 2.0: Создать .htaccess (Для Чистых URL) **
+**Задача 2.0: Создать .htaccess (Для Чистых URL) ** ✅ ЗАВЕРШЕНО
 Подзадача 2.0.1: ✅ ЗАВЕРШЕНО Создать файл .htaccess в корне сайта (на ПК, затем FTP в корень maxmarshall.indevs.in).
    - Содержимое:
      ```
@@ -105,7 +105,7 @@ The architecture is now fully defined. This plan ensures that the "child" site r
 
 Подзадача 2.0.2: ✅ ЗАВЕРШЕНО Загрузить .htaccess по FTP (убедись, что хостинг поддерживает Apache/.htaccess — стандарт для shared).
 
-✅ ЗАВЕРШЕНО **Задача 2.1: Общие Изменения (Для index.html и post.html)**
+**Задача 2.1: Общие Изменения (Для index.html и post.html)** ✅ ЗАВЕРШЕНО
 Подзадача 2.1.1: ✅ ЗАВЕРШЕНО Добавить marked.js CDN в <head> обоих файлов.
    - Вставить перед </head>:
      ```html
@@ -169,7 +169,7 @@ The architecture is now fully defined. This plan ensures that the "child" site r
      }
      ```
 
-✅ ЗАВЕРШЕНО **Задача 2.2: Изменения в index.html (Главная Лента)**
+**Задача 2.2: Изменения в index.html (Главная Лента)** ✅ ЗАВЕРШЕНО
 Подзадача 2.2.1: ✅ ЗАВЕРШЕНО Заменить статический const posts = [...] на динамический рендер.
    - Найти весь блок // Sample Post Data и массив posts.
    - Заменить на:
@@ -202,7 +202,7 @@ The architecture is now fully defined. This plan ensures that the "child" site r
    - В контейнер ленты: <p id="loading">Загрузка постов...</p>
    - В JS: Скрыть после render.
 
-✅ ЗАВЕРШЕНО **Задача 2.3: Изменения в post.html (Единый Шаблон Детального Поста)**
+**Задача 2.3: Изменения в post.html (Единый Шаблон Детального Поста)** ✅ ЗАВЕРШЕНО
 Подзадача 2.3.1: ✅ ЗАВЕРШЕНО Заменить статический контент на динамический.
    - Найти <div class="mb-6"> (title + description) → добавить id="post-header".
    - Найти featured image div → id="featured-image".
