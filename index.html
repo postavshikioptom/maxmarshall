@@ -187,164 +187,79 @@
         <button class="text-white"><span class="material-symbols-outlined text-2xl">mail</span></button>
     </nav>
     <script>
-        const TARGET_SITE = 'maxmarshall';
         const REPO = 'postavshikioptom/multiverse_decapcms';
-        const POSTS_PATH = 'content/posts';
+        const BRANCH = 'main';
+        const POSTS_FOLDER = 'content/posts';
+        const TARGET_SITE = 'maxmarshall';
 
         async function loadPosts() {
+            // localStorage.clear(); // Раскомментируй для полного сброса кэша (один раз)
+            // const cacheKey = 'posts_cache_maxmarshall'; // Закомментируй для теста без кэша
+            // ... (кэш код закомментируй временно)
+
             const posts = [];
             try {
-                const apiUrl = `https://api.github.com/repos/${REPO}/contents/${POSTS_PATH}`;
-                const response = await fetch(apiUrl);
-                if (!response.ok) throw new Error('API error');
+                const listUrl = `https://api.github.com/repos/${REPO}/contents/${POSTS_FOLDER}?ref=${BRANCH}`;
+                const response = await fetch(listUrl);
+                if (!response.ok) throw new Error(`API error: ${response.status}`);
                 const files = await response.json();
+                console.log('Files from API:', files); // DEBUG: Список файлов
 
                 for (const file of files) {
                     if (file.name.endsWith('.md')) {
                         const rawUrl = file.download_url;
                         const text = await fetch(rawUrl).then(res => res.text());
-                        const frontmatterMatch = text.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
-                        if (frontmatterMatch) {
-                            const fm = {};
-                            frontmatterMatch[1].split('\n').forEach(line => {
-                                const [key, ...valueParts] = line.split(': ');
-                                if (key) fm[key.trim()] = valueParts.join(': ').trim().replace(/^["']|["']$/g, '');
+                        console.log(`Raw text for ${file.name}:`, text.substring(0, 500)); // DEBUG: Первые 500 символов
+
+                        // Улучшенный regex: Игнорирует пустые строки в начале
+                        const frontmatterMatch = text.match(/^\s*---\s*\n([\s\S]*?)\n\s*---\s*\n([\s\S]*)$/);
+                        if (!frontmatterMatch) {
+                            console.warn(`No frontmatter in ${file.name}`);
+                            continue;
+                        }
+
+                        const fm = {};
+                        const lines = frontmatterMatch[1].split('\n');
+                        for (let line of lines) {
+                            line = line.trim();
+                            if (!line || line.startsWith('#')) continue; // Пропуск пустых/комментов
+                            const colonIndex = line.indexOf(':');
+                            if (colonIndex === -1) continue;
+                            const key = line.substring(0, colonIndex).trim();
+                            let value = line.substring(colonIndex + 1).trim().replace(/^["']|["']$/g, '');
+                            fm[key] = value;
+                        }
+                        console.log(`Parsed FM for ${file.name}:`, fm); // DEBUG: Что спарсилось
+
+                        if (fm.target_site === TARGET_SITE || !fm.target_site) {
+                            posts.push({
+                                title: fm.title || 'Без заголовка',
+                                description: fm.description || '',
+                                date: new Date(fm.date || '2026-01-01'),
+                                slug: fm.slug || file.name.replace('.md', ''),
+                                media: fm.media || '',
+                                tags: fm.tags || '',
+                                body: frontmatterMatch[2].trim(),
+                                renderedBody: marked.parse(frontmatterMatch[2].trim())
                             });
-                            if (fm.target_site === TARGET_SITE || !fm.target_site) {
-                                posts.push({
-                                    id: posts.length + 1,
-                                    author: 'Max Marshall',
-                                    handle: '@maxmarshall',
-                                    time: fm.date ? new Date(fm.date).toLocaleDateString('ru-RU') : 'Сегодня',
-                                    title: fm.title || file.name.replace('.md', ''),
-                                    excerpt: fm.description || frontmatterMatch[2].substring(0, 150) + '...',
-                                    image: fm.media || '',
-                                    category: fm.tags ? fm.tags.split(',')[0].trim() : '3D Models',
-                                    stats: { replies: '0', sync: '0', likes: '0', views: '0' },
-                                    body: frontmatterMatch[2].trim(),
-                                    slug: fm.slug || file.name.replace('.md', '')
-                                });
-                            }
                         }
                     }
                 }
-                posts.sort((a, b) => new Date(b.time) - new Date(a.time));
-            } catch (e) {
-                console.error('Error loading posts:', e);
+
+                posts.sort((a, b) => b.date - a.date);
+                console.log('Final posts array:', posts); // DEBUG: Массив постов
+
+                // localStorage.setItem... (верни после теста)
+                return posts;
+            } catch (error) {
+                console.error('Error loading posts:', error);
+                return [];
             }
-            return posts;
         }
 
-        async function renderFeed() {
-            document.getElementById('loadingState').classList.remove('hidden');
-            const posts = await loadPosts();
-            document.getElementById('loadingState').classList.add('hidden');
-            const feed = document.getElementById('postFeed');
-            feed.innerHTML = '';
-            posts.forEach(post => {
-                const card = document.createElement('article');
-                card.className = 'post-card border-b border-border-color p-4 hover:bg-white/5 transition-colors cursor-pointer';
-                card.onclick = () => viewPost(post.slug);
-                card.innerHTML = `
-                <div class="flex gap-3">
-                    <img class="size-12 rounded-full bg-surface" src="https://api.dicebear.com/7.x/initials/svg?seed=$$   {post.author}" alt="   $${post.author}" />
-                    <div class="flex-1">
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="font-bold">${post.author}</span>
-                            <span class="text-gray-500 text-sm">${post.handle} · ${post.time}</span>
-                        </div>
-                        <h3 class="post-title font-semibold mb-2">${post.title}</h3>
-                        <p class="text-gray-300 mb-3">${post.excerpt}</p>
-                        ${post.image ? `<img class="rounded-2xl w-full mb-3" src="${post.image}" alt="Media" />` : ''}
-                        <div class="flex justify-between text-gray-500 text-sm">
-                            <span>💬 ${post.stats.replies}</span>
-                            <span>🔄 ${post.stats.sync}</span>
-                            <span>❤️ ${post.stats.likes}</span>
-                            <span>👁️ ${post.stats.views}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-                feed.appendChild(card);
-            });
-        }
+        // renderFeed() и остальное — оставь как есть, но в if (posts.length === 0) добавь console.log('No posts rendered');
 
-        async function renderTrending() {
-            const posts = await loadPosts();
-            const trending = document.getElementById('trendingPosts');
-            trending.innerHTML = '';
-            posts.slice(0, 5).forEach(post => {
-                const item = document.createElement('a');
-                item.className = 'px-4 py-3 hover:bg-white/5 transition-colors block';
-                item.href = `#post/${post.slug}`;
-                item.innerHTML = `
-                <div class="text-gray-500 text-xs">${post.category} · Trending</div>
-                <div class="font-bold">${post.title}</div>
-                <div class="text-gray-500 text-xs">${post.stats.views} views</div>
-            `;
-                trending.appendChild(item);
-            });
-        }
-
-        function viewPost(slug) {
-            loadPosts().then(posts => {
-                const post = posts.find(p => p.slug === slug);
-                if (post) {
-                    document.getElementById('mainContent').innerHTML = `
-                    <div class="sticky top-14 z-40 glass-header border-b border-border-color p-4">
-                        <button onclick="showHome()" class="flex items-center gap-4">
-                            <span class="material-symbols-outlined">arrow_back</span> Back
-                        </button>
-                    </div>
-                    <article class="p-4 max-w-[600px] mx-auto">
-                        <div class="flex gap-3 mb-4">
-                            <img class="size-12 rounded-full bg-surface" src="https://api.dicebear.com/7.x/initials/svg?seed=$$   {post.author}" alt="   $${post.author}" />
-                            <div>
-                                <span class="font-bold">${post.author}</span>
-                                <span class="text-gray-500 text-sm block">${post.handle} · ${post.time}</span>
-                            </div>
-                        </div>
-                        <h1 class="text-3xl font-bold mb-4">${post.title}</h1>
-                        ${post.image ? `<img class="rounded-2xl w-full mb-6" src="${post.image}" alt="Media" />` : ''}
-                        <div class="prose prose-invert max-w-none">${marked.parse(post.body)}</div>
-                    </article>
-                `;
-                }
-            });
-        }
-
-        function showHome() {
-            location.hash = '';
-            renderFeed();
-            renderTrending();
-        }
-
-        // Поиск
-        document.getElementById('searchInput').addEventListener('input', e => {
-            const query = e.target.value.toLowerCase();
-            document.querySelectorAll('.post-card').forEach(card => {
-                const text = card.textContent.toLowerCase();
-                card.style.display = text.includes(query) ? '' : 'none';
-            });
-        });
-
-        // Инит
-        window.addEventListener('load', () => {
-            renderFeed();
-            renderTrending();
-        });
-        window.addEventListener('hashchange', () => {
-            if (location.hash.startsWith('#post/')) {
-                viewPost(location.hash.substring(6));
-            } else {
-                showHome();
-            }
-        });
-
-        // Marked для Markdown
-        const markedScript = document.createElement('script');
-        markedScript.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
-        document.head.appendChild(markedScript);
+        // В конце window.load: renderFeed(); renderTrending(); (если есть)
     </script>
 </body>
 
