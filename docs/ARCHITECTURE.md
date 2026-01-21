@@ -204,81 +204,391 @@ The architecture is now fully defined. This plan ensures that the "child" site r
    
 Подзадача 2.2.3: Обновленный код скрипт вниз после <body> для подгрузки постов
 ```
-<script>
-    const REPO = 'postavshikioptom/multiverse_decapcms';
-    const BRANCH = 'main';
-    const POSTS_FOLDER = 'content/posts';
-    const TARGET_SITE = 'maxmarshall';
+<!DOCTYPE html>
+<html class="dark" lang="en">
 
-    async function loadPosts() {
-        // localStorage.clear(); // Раскомментируй для полного сброса кэша (один раз)
-        // const cacheKey = 'posts_cache_maxmarshall'; // Закомментируй для теста без кэша
-        // ... (кэш код закомментируй временно)
-
-        const posts = [];
-        try {
-            const listUrl = `https://api.github.com/repos/${REPO}/contents/${POSTS_FOLDER}?ref=${BRANCH}`;
-            const response = await fetch(listUrl);
-            if (!response.ok) throw new Error(`API error: ${response.status}`);
-            const files = await response.json();
-            console.log('Files from API:', files); // DEBUG: Список файлов
-
-            for (const file of files) {
-                if (file.name.endsWith('.md')) {
-                    const rawUrl = file.download_url;
-                    const text = await fetch(rawUrl).then(res => res.text());
-                    console.log(`Raw text for ${file.name}:`, text.substring(0, 500)); // DEBUG: Первые 500 символов
-
-                    // Улучшенный regex: Игнорирует пустые строки в начале
-                    const frontmatterMatch = text.match(/^\s*---\s*\n([\s\S]*?)\n\s*---\s*\n([\s\S]*)$/);
-                    if (!frontmatterMatch) {
-                        console.warn(`No frontmatter in ${file.name}`);
-                        continue;
-                    }
-
-                    const fm = {};
-                    const lines = frontmatterMatch[1].split('\n');
-                    for (let line of lines) {
-                        line = line.trim();
-                        if (!line || line.startsWith('#')) continue; // Пропуск пустых/комментов
-                        const colonIndex = line.indexOf(':');
-                        if (colonIndex === -1) continue;
-                        const key = line.substring(0, colonIndex).trim();
-                        let value = line.substring(colonIndex + 1).trim().replace(/^["']|["']$/g, '');
-                        fm[key] = value;
-                    }
-                    console.log(`Parsed FM for ${file.name}:`, fm); // DEBUG: Что спарсилось
-
-                    if (fm.target_site === TARGET_SITE || !fm.target_site) {
-                        posts.push({
-                            title: fm.title || 'Без заголовка',
-                            description: fm.description || '',
-                            date: new Date(fm.date || '2026-01-01'),
-                            slug: fm.slug || file.name.replace('.md', ''),
-                            media: fm.media || '',
-                            tags: fm.tags || '',
-                            body: frontmatterMatch[2].trim(),
-                            renderedBody: marked.parse(frontmatterMatch[2].trim())
-                        });
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>X-Blog | Home Feed</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply bg-black text-white font-['Plus_Jakarta_Sans'];
+            }
+        }
+        :root {
+            --primary: #1d9bf0;
+            --surface: #1f1f1f;
+            --border: #2f3336;
+        }
+        .glass-header {
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(12px);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .post-card:hover .post-title {
+            color: var(--primary);
+        }
+        .sidebar-link.active {
+            @apply font-bold;
+        }
+        .sidebar-link.active span:first-child {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1d9bf0",
+                        "surface": "#1f1f1f",
+                        "border-color": "#2f3336",
                     }
                 }
             }
-
-            posts.sort((a, b) => b.date - a.date);
-            console.log('Final posts array:', posts); // DEBUG: Массив постов
-
-            // localStorage.setItem... (верни после теста)
-            return posts;
-        } catch (error) {
-            console.error('Error loading posts:', error);
-            return [];
         }
-    }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
 
-    // renderFeed() и остальное — оставь как есть, но в if (posts.length === 0) добавь console.log('No posts rendered');
+<body class="bg-black text-white antialiased">
+    <header class="fixed top-0 z-50 w-full glass-header border-b border-border-color">
+        <div class="max-w-[1250px] mx-auto flex h-14 items-center justify-between px-4 lg:px-8">
+            <div class="flex items-center gap-8">
+                <a class="flex items-center gap-2" href="#" onclick="showHome()">
+                    <div class="text-primary size-8 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-3xl font-bold">terminal</span>
+                    </div>
+                    <h1 class="text-xl font-extrabold tracking-tight hidden sm:block">X-Blog</h1>
+                </a>
+            </div>
+            <div class="flex-1 max-w-md mx-4">
+                <div class="relative w-full group">
+                    <div
+                        class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-gray-500 group-focus-within:text-primary transition-colors">
+                        <span class="material-symbols-outlined text-[20px]">search</span>
+                    </div>
+                    <input
+                        class="block w-full pl-11 pr-4 py-2 bg-[#202327] border-none focus:ring-1 focus:ring-primary rounded-full text-sm placeholder-gray-500 text-white"
+                        id="searchInput" placeholder="Search posts..." type="text" />
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="p-2 hover:bg-white/10 rounded-full transition-colors hidden sm:block">
+                    <span class="material-symbols-outlined">settings</span>
+                </button>
+            </div>
+        </div>
+    </header>
+    <main class="max-w-[1250px] mx-auto pt-14 flex min-h-screen">
+        <aside
+            class="hidden md:flex flex-col w-20 lg:w-64 border-r border-border-color py-4 px-2 lg:px-4 sticky top-14 h-[calc(100vh-3.5rem)]">
+            <div class="flex flex-col gap-1">
+                <a class="sidebar-link active flex items-center gap-4 px-4 py-3 rounded-full hover:bg-white/10 transition-colors"
+                    href="#" onclick="showHome()">
+                    <span class="material-symbols-outlined text-2xl">home</span>
+                    <span class="text-xl hidden lg:block">Home</span>
+                </a>
+                <a class="sidebar-link flex items-center gap-4 px-4 py-3 rounded-full hover:bg-white/10 transition-colors"
+                    href="#">
+                    <span class="material-symbols-outlined text-2xl">explore</span>
+                    <span class="text-xl hidden lg:block">Explore</span>
+                </a>
+                <a class="sidebar-link flex items-center gap-4 px-4 py-3 rounded-full hover:bg-white/10 transition-colors"
+                    href="#">
+                    <span class="material-symbols-outlined text-2xl">notifications</span>
+                    <span class="text-xl hidden lg:block">Notifications</span>
+                </a>
+                <a class="sidebar-link flex items-center gap-4 px-4 py-3 rounded-full hover:bg-white/10 transition-colors"
+                    href="#">
+                    <span class="material-symbols-outlined text-2xl">mail</span>
+                    <span class="text-xl hidden lg:block">Messages</span>
+                </a>
+                <a class="sidebar-link flex items-center gap-4 px-4 py-3 rounded-full hover:bg-white/10 transition-colors"
+                    href="#">
+                    <span class="material-symbols-outlined text-2xl">person</span>
+                    <span class="text-xl hidden lg:block">Profile</span>
+                </a>
+            </div>
+            <button
+                class="mt-6 w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-full transition-all active:scale-95 shadow-lg lg:block hidden">
+                Post
+            </button>
+            <button
+                class="mt-6 size-12 flex items-center justify-center bg-primary hover:bg-primary/90 text-white font-bold rounded-full transition-all active:scale-95 shadow-lg lg:hidden mx-auto">
+                <span class="material-symbols-outlined">edit</span>
+            </button>
+        </aside>
+        <section class="flex-1 max-w-[600px] border-r border-border-color min-h-screen" id="mainContent">
+            <div class="sticky top-14 z-40 glass-header border-b border-border-color">
+                <div class="flex text-center h-14">
+                    <button
+                        class="flex-1 hover:bg-white/10 transition-colors font-bold relative flex items-center justify-center">
+                        For You
+                        <div class="absolute bottom-0 h-1 w-16 bg-primary rounded-full"></div>
+                    </button>
+                    <button class="flex-1 hover:bg-white/10 transition-colors text-gray-500 font-medium">
+                        Following
+                    </button>
+                </div>
+            </div>
+            <div class="flex flex-col" id="postFeed">
+            </div>
+            <div class="p-8 text-center hidden" id="loadingState">
+                <div class="inline-block size-6 border-2 border-primary border-t-transparent rounded-full animate-spin">
+                </div>
+            </div>
+        </section>
+        <aside
+            class="hidden xl:block w-80 py-4 px-6 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto hide-scrollbar">
+            <div class="bg-[#16181c] rounded-2xl overflow-hidden mb-4">
+                <h3 class="px-4 py-3 text-xl font-extrabold">What's happening</h3>
+                <div class="flex flex-col" id="trendingPosts">
+                </div>
+                <a class="block px-4 py-3 text-primary text-sm hover:bg-white/5 transition-colors" href="#">Show
+                    more</a>
+            </div>
+            <div class="bg-[#16181c] rounded-2xl overflow-hidden border border-border-color">
+                <h3 class="px-4 py-3 text-xl font-extrabold">Categories</h3>
+                <div class="px-4 pb-4 flex flex-wrap gap-2">
+                    <a class="px-3 py-1 bg-black/40 border border-border-color rounded-full text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
+                        href="#">#Engineering</a>
+                    <a class="px-3 py-1 bg-black/40 border border-border-color rounded-full text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
+                        href="#">#UXDesign</a>
+                    <a class="px-3 py-1 bg-black/40 border border-border-color rounded-full text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
+                        href="#">#ReactJS</a>
+                    <a class="px-3 py-1 bg-black/40 border border-border-color rounded-full text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
+                        href="#">#WebPerf</a>
+                </div>
+            </div>
+            <footer class="mt-4 px-4 flex flex-wrap gap-x-3 gap-y-1">
+                <a class="text-[13px] text-gray-500 hover:underline" href="#">Terms of Service</a>
+                <a class="text-[13px] text-gray-500 hover:underline" href="#">Privacy Policy</a>
+                <a class="text-[13px] text-gray-500 hover:underline" href="#">Cookie Policy</a>
+                <span class="text-[13px] text-gray-500">© 2024 X-Blog Corp.</span>
+            </footer>
+        </aside>
+    </main>
+    <nav
+        class="fixed bottom-0 w-full glass-header border-t border-border-color flex justify-around py-3 md:hidden z-50">
+        <button class="text-primary" onclick="showHome()"><span
+                class="material-symbols-outlined text-2xl font-variation-fill">home</span></button>
+        <button class="text-white"><span class="material-symbols-outlined text-2xl">search</span></button>
+        <button class="text-white"><span class="material-symbols-outlined text-2xl">notifications</span></button>
+        <button class="text-white"><span class="material-symbols-outlined text-2xl">mail</span></button>
+    </nav>
+    <script>
+        const REPO = 'postavshikioptom/multiverse_decapcms';
+        const BRANCH = 'main';
+        const POSTS_FOLDER = 'content/posts';
+        const TARGET_SITE = 'maxmarshall';
 
-    // В конце window.load: renderFeed(); renderTrending(); (если есть)
-</script>
+        async function loadPosts() {
+            // localStorage.clear(); // Раскомментируй для полного сброса кэша (один раз)
+            // const cacheKey = 'posts_cache_maxmarshall'; // Закомментируй для теста без кэша
+            // ... (кэш код закомментируй временно)
+
+            const posts = [];
+            try {
+                const listUrl = `https://api.github.com/repos/${REPO}/contents/${POSTS_FOLDER}?ref=${BRANCH}`;
+                const response = await fetch(listUrl);
+                if (!response.ok) throw new Error(`API error: ${response.status}`);
+                const files = await response.json();
+                console.log('Files from API:', files); // DEBUG: Список файлов
+
+                for (const file of files) {
+                    if (file.name.endsWith('.md')) {
+                        const rawUrl = file.download_url;
+                        const text = await fetch(rawUrl).then(res => res.text());
+                        console.log(`Raw text for ${file.name}:`, text.substring(0, 500)); // DEBUG: Первые 500 символов
+
+                        // Улучшенный regex: Игнорирует пустые строки в начале
+                        const frontmatterMatch = text.match(/^\s*---\s*\n([\s\S]*?)\n\s*---\s*\n([\s\S]*)$/);
+                        if (!frontmatterMatch) {
+                            console.warn(`No frontmatter in ${file.name}`);
+                            continue;
+                        }
+
+                        const fm = {};
+                        const lines = frontmatterMatch[1].split('\n');
+                        for (let line of lines) {
+                            line = line.trim();
+                            if (!line || line.startsWith('#')) continue; // Пропуск пустых/комментов
+                            const colonIndex = line.indexOf(':');
+                            if (colonIndex === -1) continue;
+                            const key = line.substring(0, colonIndex).trim();
+                            let value = line.substring(colonIndex + 1).trim().replace(/^["']|["']$/g, '');
+                            fm[key] = value;
+                        }
+                        console.log(`Parsed FM for ${file.name}:`, fm); // DEBUG: Что спарсилось
+
+                        if (fm.target_site === TARGET_SITE || !fm.target_site) {
+                            posts.push({
+                                // Поля для совместимости с текущим UI
+                                author: 'Max Marshall',
+                                handle: '@maxmarshall',
+                                time: fm.date ? new Date(fm.date).toLocaleDateString('ru-RU') : 'Сегодня',
+                                excerpt: fm.description || frontmatterMatch[2].substring(0, 150) + '...',
+                                image: fm.media || '',
+                                category: fm.tags ? fm.tags.split(',')[0].trim() : '3D Models',
+                                stats: { replies: '0', sync: '0', likes: '0', views: '0' },
+                                // Оригинальные поля из запроса
+                                title: fm.title || 'Без заголовка',
+                                description: fm.description || '',
+                                date: new Date(fm.date || '2026-01-01'),
+                                slug: fm.slug || file.name.replace('.md', ''),
+                                media: fm.media || '',
+                                tags: fm.tags || '',
+                                body: frontmatterMatch[2].trim(),
+                                renderedBody: marked.parse(frontmatterMatch[2].trim())
+                            });
+                        }
+                    }
+                }
+
+                posts.sort((a, b) => b.date - a.date);
+                console.log('Final posts array:', posts); // DEBUG: Массив постов
+                if (posts.length === 0) {
+                    console.warn('Нет постов после фильтра по target_site =', TARGET_SITE);
+                }
+
+                // localStorage.setItem... (верни после теста)
+                return posts;
+            } catch (error) {
+                console.error('Error loading posts:', error);
+                return [];
+            }
+        }
+
+        async function renderFeed() {
+            document.getElementById('loadingState').classList.remove('hidden');
+            const posts = await loadPosts();
+            document.getElementById('loadingState').classList.add('hidden');
+            const feed = document.getElementById('postFeed');
+            feed.innerHTML = '';
+            posts.forEach(post => {
+                const card = document.createElement('article');
+                card.className = 'post-card border-b border-border-color p-4 hover:bg-white/5 transition-colors cursor-pointer';
+                card.onclick = () => viewPost(post.slug);
+                card.innerHTML = `
+                <div class="flex gap-3">
+                    <img class="size-12 rounded-full bg-surface" src="https://api.dicebear.com/7.x/initials/svg?seed=${post.author}" alt="${post.author}" />
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="font-bold">${post.author}</span>
+                            <span class="text-gray-500 text-sm">${post.handle} · ${post.time}</span>
+                        </div>
+                        <h3 class="post-title font-semibold mb-2">${post.title}</h3>
+                        <p class="text-gray-300 mb-3">${post.excerpt}</p>
+                        ${post.image ? `<img class="rounded-2xl w-full mb-3" src="${post.image}" alt="Media" />` : ''}
+                        <div class="flex justify-between text-gray-500 text-sm">
+                            <span>💬 ${post.stats.replies}</span>
+                            <span>🔄 ${post.stats.sync}</span>
+                            <span>❤️ ${post.stats.likes}</span>
+                            <span>👁️ ${post.stats.views}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+                feed.appendChild(card);
+            });
+        }
+
+        async function renderTrending() {
+            const posts = await loadPosts();
+            const trending = document.getElementById('trendingPosts');
+            trending.innerHTML = '';
+            posts.slice(0, 5).forEach(post => {
+                const item = document.createElement('div');
+                item.className = 'px-4 py-3 hover:bg-white/5 transition-colors block cursor-pointer';
+                item.onclick = () => viewPost(post.slug);
+                item.innerHTML = `
+                <div class="text-gray-500 text-xs">${post.category} · Trending</div>
+                <div class="font-bold">${post.title}</div>
+                <div class="text-gray-500 text-xs">${post.stats.views} views</div>
+            `;
+                trending.appendChild(item);
+            });
+        }
+
+        function viewPost(slug) {
+            loadPosts().then(posts => {
+                const post = posts.find(p => p.slug === slug);
+                if (post) {
+                    document.getElementById('mainContent').innerHTML = `
+                    <div class="sticky top-14 z-40 glass-header border-b border-border-color p-4">
+                        <button onclick="showHome()" class="flex items-center gap-4">
+                            <span class="material-symbols-outlined">arrow_back</span> Back
+                        </button>
+                    </div>
+                    <article class="p-4 max-w-[600px] mx-auto">
+                        <div class="flex gap-3 mb-4">
+                            <img class="size-12 rounded-full bg-surface" src="https://api.dicebear.com/7.x/initials/svg?seed=${post.author}" alt="${post.author}" />
+                            <div>
+                                <span class="font-bold">${post.author}</span>
+                                <span class="text-gray-500 text-sm block">${post.handle} · ${post.time}</span>
+                            </div>
+                        </div>
+                        <h1 class="text-3xl font-bold mb-4">${post.title}</h1>
+                        ${post.image ? `<img class="rounded-2xl w-full mb-6" src="${post.image}" alt="Media" />` : ''}
+                        <div class="prose prose-invert max-w-none">${marked.parse(post.body)}</div>
+                    </article>
+                `;
+                }
+            });
+        }
+
+        function showHome() {
+            location.hash = '';
+            renderFeed();
+            renderTrending();
+        }
+
+        // Поиск
+        document.getElementById('searchInput').addEventListener('input', e => {
+            const query = e.target.value.toLowerCase();
+            document.querySelectorAll('.post-card').forEach(card => {
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(query) ? '' : 'none';
+            });
+        });
+
+        // Инит
+        window.addEventListener('load', () => {
+            renderFeed();
+            renderTrending();
+        });
+        window.addEventListener('hashchange', () => {
+            if (location.hash.startsWith('#post/')) {
+                viewPost(location.hash.substring(6));
+            } else {
+                showHome();
+            }
+        });
+
+        // Marked для Markdown
+        const markedScript = document.createElement('script');
+        markedScript.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+        document.head.appendChild(markedScript);
+    </script>
+</body>
+
+</html>
 ```
    
 
