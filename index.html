@@ -324,13 +324,14 @@
             loadPosts().then(posts => {
                 const post = posts.find(p => p.slug === slug);
                 if (post) {
-                    // Скрываем left aside для 2 колонок (контент + right sidebar)
-                    document.querySelector('aside:nth-of-type(1)').classList.add('hidden');  // Left nav скрыт
-                    // Расширяем центр для полноты
-                    document.getElementById('mainContent').classList.remove('max-w-[600px]');
-                    document.getElementById('mainContent').classList.add('max-w-[800px]', 'mx-auto');
+                    // Скрываем left aside для 2 колонок (контент слева + right trending справа)
+                    document.querySelector('aside:first-of-type').classList.add('hidden');
+                    // Расширяем центр
+                    const mainContent = document.getElementById('mainContent');
+                    mainContent.classList.remove('max-w-[600px]');
+                    mainContent.classList.add('max-w-none', 'border-r-0');  // Убираем правую границу для полноты
 
-                    document.getElementById('mainContent').innerHTML = `
+                    mainContent.innerHTML = `
                         <div class="sticky top-14 z-40 glass-header border-b border-border-color px-4 py-3">
                             <button onclick="showHome()" class="flex items-center gap-4 text-primary font-bold">
                                 <span class="material-symbols-outlined">arrow_back</span>
@@ -351,20 +352,20 @@
                                     <p class="font-bold">Max Marshall</p>
                                     <span class="material-symbols-outlined text-primary text-[16px]">verified</span>
                                 </div>
-                                <p class="text-sm text-slate-500">@max • ${new Date(post.date).toLocaleDateString('ru-RU')}</p>
+                                <p class="text-sm text-slate-500">@max • ${post.time || new Date(post.date).toLocaleDateString('ru-RU')}</p>
                             </header>
 
-                            <!-- Featured image как в post.html (background div) -->
+                            <!-- Featured image как в post.html -->
                             ${post.media ? `
                                 <div class="w-full aspect-[16/9] rounded-xl bg-center bg-no-repeat bg-cover mb-8 border border-border-color" style="background-image: url('${post.media}')"></div>
                             ` : ''}
 
                             <!-- Body как в post.html -->
-                            <div class="article-content prose prose-invert max-w-none prose-headings:font-bold prose-h2:text-2xl prose-p:mb-6 prose-blockquote:border-l-primary prose-blockquote:pl-4 prose-strong:text-white">
+                            <div class="article-content prose prose-invert max-w-none prose-p:mb-6 prose-blockquote:border-l-primary prose-blockquote:pl-4">
                                 ${marked.parse(post.body)}
                             </div>
 
-                            <!-- Кнопка назад снизу как в post.html -->
+                            <!-- Кнопка назад снизу -->
                             <div class="mt-10">
                                 <button onclick="showHome()" class="px-6 py-2 bg-primary text-white font-bold rounded-full hover:bg-primary/90 transition-colors">
                                     ← Назад
@@ -373,16 +374,17 @@
                         </div>
                     `;
                 } else {
-                    document.getElementById('mainContent').innerHTML = '<p class="p-8 text-center text-gray-500">Пост не найден (404)</p>';
+                    document.getElementById('mainContent').innerHTML = '<p class="p-8 text-center text-gray-500">Пост не найден</p>';
                 }
             });
         }
 
         function showHome() {
-            // Восстанавливаем 3 колонки и ширину центра
-            document.querySelector('aside:nth-of-type(1)').classList.remove('hidden');
-            document.getElementById('mainContent').classList.add('max-w-[600px]');
-            document.getElementById('mainContent').classList.remove('max-w-[800px]', 'mx-auto');
+            // Восстанавливаем 3 колонки
+            document.querySelector('aside:first-of-type').classList.remove('hidden');
+            const mainContent = document.getElementById('mainContent');
+            mainContent.classList.add('max-w-[600px]');
+            mainContent.classList.remove('max-w-none', 'border-r-0');
 
             location.hash = '';
             renderFeed();
