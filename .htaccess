@@ -1,0 +1,12 @@
+RewriteEngine On
+
+# Если файл или папка реально существует (index.html, assets) — отдавать напрямую
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Главная / → index.html
+RewriteRule ^$ index.html [L]
+
+# Все остальные пути (slug) → post.html с query slug
+RewriteRule ^([^/]+)/?$ post.html?slug=$1 [QSA,L]
