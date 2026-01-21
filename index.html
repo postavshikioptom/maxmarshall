@@ -1,12 +1,17 @@
 <!DOCTYPE html>
-<html class="dark" lang="en"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>X-Blog | Home Feed</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<style type="text/tailwindcss">
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>X-Blog | Home Feed</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <style type="text/tailwindcss">
         @layer base {
             body {
                 @apply bg-black text-white font-['Plus_Jakarta_Sans'];
@@ -38,7 +43,7 @@
             font-variation-settings: 'FILL' 1;
         }
     </style>
-<script id="tailwind-config">
+    <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
             theme: {
@@ -53,156 +58,178 @@
         }
     </script>
 </head>
+
 <body class="bg-black text-white antialiased">
-<header class="fixed top-0 z-50 w-full glass-header border-b border-border-color">
-<div class="max-w-[1250px] mx-auto flex h-14 items-center justify-between px-4 lg:px-8">
-<div class="flex items-center gap-8">
-<a class="flex items-center gap-2" href="#" onclick="showHome()">
-<div class="text-primary size-8 flex items-center justify-center">
-<span class="material-symbols-outlined text-3xl font-bold">terminal</span>
-</div>
-<h1 class="text-xl font-extrabold tracking-tight hidden sm:block">X-Blog</h1>
-</a>
-</div>
-<div class="flex-1 max-w-md mx-4">
-<div class="relative w-full group">
-<div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-gray-500 group-focus-within:text-primary transition-colors">
-<span class="material-symbols-outlined text-[20px]">search</span>
-</div>
-<input class="block w-full pl-11 pr-4 py-2 bg-[#202327] border-none focus:ring-1 focus:ring-primary rounded-full text-sm placeholder-gray-500 text-white" id="searchInput" placeholder="Search posts..." type="text"/>
-</div>
-</div>
-<div class="flex items-center gap-4">
-<button class="p-2 hover:bg-white/10 rounded-full transition-colors hidden sm:block">
-<span class="material-symbols-outlined">settings</span>
-</button>
-</div>
-</div>
-</header>
-<main class="max-w-[1250px] mx-auto pt-14 flex min-h-screen">
-<aside class="hidden md:flex flex-col w-20 lg:w-64 border-r border-border-color py-4 px-2 lg:px-4 sticky top-14 h-[calc(100vh-3.5rem)]">
-<div class="flex flex-col gap-1">
-<a class="sidebar-link active flex items-center gap-4 px-4 py-3 rounded-full hover:bg-white/10 transition-colors" href="#" onclick="showHome()">
-<span class="material-symbols-outlined text-2xl">home</span>
-<span class="text-xl hidden lg:block">Home</span>
-</a>
-<a class="sidebar-link flex items-center gap-4 px-4 py-3 rounded-full hover:bg-white/10 transition-colors" href="#">
-<span class="material-symbols-outlined text-2xl">explore</span>
-<span class="text-xl hidden lg:block">Explore</span>
-</a>
-<a class="sidebar-link flex items-center gap-4 px-4 py-3 rounded-full hover:bg-white/10 transition-colors" href="#">
-<span class="material-symbols-outlined text-2xl">notifications</span>
-<span class="text-xl hidden lg:block">Notifications</span>
-</a>
-<a class="sidebar-link flex items-center gap-4 px-4 py-3 rounded-full hover:bg-white/10 transition-colors" href="#">
-<span class="material-symbols-outlined text-2xl">mail</span>
-<span class="text-xl hidden lg:block">Messages</span>
-</a>
-<a class="sidebar-link flex items-center gap-4 px-4 py-3 rounded-full hover:bg-white/10 transition-colors" href="#">
-<span class="material-symbols-outlined text-2xl">person</span>
-<span class="text-xl hidden lg:block">Profile</span>
-</a>
-</div>
-<button class="mt-6 w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-full transition-all active:scale-95 shadow-lg lg:block hidden">
-            Post
-        </button>
-<button class="mt-6 size-12 flex items-center justify-center bg-primary hover:bg-primary/90 text-white font-bold rounded-full transition-all active:scale-95 shadow-lg lg:hidden mx-auto">
-<span class="material-symbols-outlined">edit</span>
-</button>
-</aside>
-<section class="flex-1 max-w-[600px] border-r border-border-color min-h-screen" id="mainContent">
-<div class="sticky top-14 z-40 glass-header border-b border-border-color">
-<div class="flex text-center h-14">
-<button class="flex-1 hover:bg-white/10 transition-colors font-bold relative flex items-center justify-center">
-                    For You
-                    <div class="absolute bottom-0 h-1 w-16 bg-primary rounded-full"></div>
-</button>
-<button class="flex-1 hover:bg-white/10 transition-colors text-gray-500 font-medium">
-                    Following
+    <header class="fixed top-0 z-50 w-full glass-header border-b border-border-color">
+        <div class="max-w-[1250px] mx-auto flex h-14 items-center justify-between px-4 lg:px-8">
+            <div class="flex items-center gap-8">
+                <a class="flex items-center gap-2" href="#" onclick="showHome()">
+                    <div class="text-primary size-8 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-3xl font-bold">terminal</span>
+                    </div>
+                    <h1 class="text-xl font-extrabold tracking-tight hidden sm:block">X-Blog</h1>
+                </a>
+            </div>
+            <div class="flex-1 max-w-md mx-4">
+                <div class="relative w-full group">
+                    <div
+                        class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-gray-500 group-focus-within:text-primary transition-colors">
+                        <span class="material-symbols-outlined text-[20px]">search</span>
+                    </div>
+                    <input
+                        class="block w-full pl-11 pr-4 py-2 bg-[#202327] border-none focus:ring-1 focus:ring-primary rounded-full text-sm placeholder-gray-500 text-white"
+                        id="searchInput" placeholder="Search posts..." type="text" />
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="p-2 hover:bg-white/10 rounded-full transition-colors hidden sm:block">
+                    <span class="material-symbols-outlined">settings</span>
                 </button>
-</div>
-</div>
-<div class="flex flex-col" id="postFeed">
-</div>
-<div class="p-8 text-center hidden" id="loadingState">
-<div class="inline-block size-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-</div>
-</section>
-<aside class="hidden xl:block w-80 py-4 px-6 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto hide-scrollbar">
-<div class="bg-[#16181c] rounded-2xl overflow-hidden mb-4">
-<h3 class="px-4 py-3 text-xl font-extrabold">What's happening</h3>
-<div class="flex flex-col" id="trendingPosts">
-</div>
-<a class="block px-4 py-3 text-primary text-sm hover:bg-white/5 transition-colors" href="#">Show more</a>
-</div>
-<div class="bg-[#16181c] rounded-2xl overflow-hidden border border-border-color">
-<h3 class="px-4 py-3 text-xl font-extrabold">Categories</h3>
-<div class="px-4 pb-4 flex flex-wrap gap-2">
-<a class="px-3 py-1 bg-black/40 border border-border-color rounded-full text-xs font-medium text-primary hover:bg-primary/10 transition-colors" href="#">#Engineering</a>
-<a class="px-3 py-1 bg-black/40 border border-border-color rounded-full text-xs font-medium text-primary hover:bg-primary/10 transition-colors" href="#">#UXDesign</a>
-<a class="px-3 py-1 bg-black/40 border border-border-color rounded-full text-xs font-medium text-primary hover:bg-primary/10 transition-colors" href="#">#ReactJS</a>
-<a class="px-3 py-1 bg-black/40 border border-border-color rounded-full text-xs font-medium text-primary hover:bg-primary/10 transition-colors" href="#">#WebPerf</a>
-</div>
-</div>
-<footer class="mt-4 px-4 flex flex-wrap gap-x-3 gap-y-1">
-<a class="text-[13px] text-gray-500 hover:underline" href="#">Terms of Service</a>
-<a class="text-[13px] text-gray-500 hover:underline" href="#">Privacy Policy</a>
-<a class="text-[13px] text-gray-500 hover:underline" href="#">Cookie Policy</a>
-<span class="text-[13px] text-gray-500">© 2024 X-Blog Corp.</span>
-</footer>
-</aside>
-</main>
-<nav class="fixed bottom-0 w-full glass-header border-t border-border-color flex justify-around py-3 md:hidden z-50">
-<button class="text-primary" onclick="showHome()"><span class="material-symbols-outlined text-2xl font-variation-fill">home</span></button>
-<button class="text-white"><span class="material-symbols-outlined text-2xl">search</span></button>
-<button class="text-white"><span class="material-symbols-outlined text-2xl">notifications</span></button>
-<button class="text-white"><span class="material-symbols-outlined text-2xl">mail</span></button>
-</nav>
-<script>
-    // Sample Post Data
-    const posts = [
-        {
-            id: 1,
-            author: "X-Architecture",
-            handle: "@static_dev",
-            time: "2h",
-            title: "The Future of Static Site Architecture: Beyond SSG",
-            excerpt: "Exploring how modern static site generators are shifting the landscape of web development towards server-less edge computing and hydration-less islands.",
-            image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAPqCB3-xoYDdF4bmFOMtiHy6JCckL-xk59zKjSoSZrRh_K4BdwxNx_kowsOcI0GIjjfVPAqxd7gdeBX90Cm6scQ0qDq2zwePoputvuksnAqg1MKoNXR2CTJ2IZ_KqqLPCv1kaOO2JsXnotSxfOUDc2mT26EMXO9OvVuQPQxGKB-l0XSQdGJV5MXeBFE84D8OuvteRuMvrQcUtXS_3iyz1ZMQHX_ZZD6_NiDnO32gWbjYFNwztDNFM3cyu8MdehH0JYArRADUsbcA",
-            category: "Technology",
-            stats: { replies: "124", sync: "48", likes: "1.2k", views: "45k" }
-        },
-        {
-            id: 2,
-            author: "Design Systems",
-            handle: "@system_ui",
-            time: "5h",
-            title: "Minimalism in the Age of Chaos",
-            excerpt: "Why brutalist and minimalist web designs are winning the attention economy in 2024. A deep dive into user cognitive load.",
-            image: "https://lh3.googleusercontent.com/aida-public/AB6AXuB8SdOo0Bl5kaTqlpIOZ2fbwfAc0dDRB6iAo_X4XZ8DutW_GGkqBMkgAmmcspDZWLLQomIAfFLCilji3JZ3vfjsbnD_H2VBTMmrvdqjAD4zOOFJK6VYi_tlSvoEJ1ZtzBI-pEuuXmbMLt2N19CvFIAsoV2ZT6RpYt6_qaZ3-H-LpkJW8Mw52ljOwgvuWxgWYXEE7OcbVQ2ha-Y15k17U9QlpViUHiXhETd5dahuLSrfbAxtf3CvyS9r9edw7BjV7rJulcm654NNpQ",
-            category: "Design",
-            stats: { replies: "56", sync: "12", likes: "842", views: "12k" }
-        },
-        {
-            id: 3,
-            author: "Fullstack Weekly",
-            handle: "@fullstack",
-            time: "8h",
-            title: "10 Performance Tips for Serverless Functions",
-            excerpt: "Cold starts are the enemy. Here is how we reduced our latency by 80% using these simple architectural tweaks that most devs miss.",
-            image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDSnvoXec_FkXIVE3NM_E9YIFAdKb3k0Pay3m2UZT-xchihxAckAF3vXye1bCWiOMVzscWJ59j4Ukrx7SlH14pceSgPDjrEuEXuoaa7NixYD_WmBS-cWLU7_NHZh7Llt2Qj26Fn3QM5RR8P28F4e1hn_A0eMO8AjWuynf9SMaJ1oYc0Z3DSKXr8fi-JnIQsOIQzi1onB3nTzLkFUuzOjNy5dgMRrdUMIUT63-ufgSu1kYrKWP-BGmMFqJVTFN1uPIGFv1WeVmrnjQ",
-            category: "Development",
-            stats: { replies: "210", sync: "89", likes: "3.4k", views: "98k" }
-        }
-    ];
-    const trending = [
-        { category: "Technology · Trending", title: "Understanding Next.js App Router", reads: "2.4k" },
-        { category: "Development", title: "The rise of Tailwind v4", reads: "1.8k" },
-        { category: "Design", title: "Why dark mode is still king", reads: "5.1k" }
-    ];
-    function renderFeed(postsToRender) {
-        const feed = document.getElementById('postFeed');
-        feed.innerHTML = postsToRender.map(post => `
+            </div>
+        </div>
+    </header>
+    <main class="max-w-[1250px] mx-auto pt-14 flex min-h-screen">
+        <aside
+            class="hidden md:flex flex-col w-20 lg:w-64 border-r border-border-color py-4 px-2 lg:px-4 sticky top-14 h-[calc(100vh-3.5rem)]">
+            <div class="flex flex-col gap-1">
+                <a class="sidebar-link active flex items-center gap-4 px-4 py-3 rounded-full hover:bg-white/10 transition-colors"
+                    href="#" onclick="showHome()">
+                    <span class="material-symbols-outlined text-2xl">home</span>
+                    <span class="text-xl hidden lg:block">Home</span>
+                </a>
+                <a class="sidebar-link flex items-center gap-4 px-4 py-3 rounded-full hover:bg-white/10 transition-colors"
+                    href="#">
+                    <span class="material-symbols-outlined text-2xl">explore</span>
+                    <span class="text-xl hidden lg:block">Explore</span>
+                </a>
+                <a class="sidebar-link flex items-center gap-4 px-4 py-3 rounded-full hover:bg-white/10 transition-colors"
+                    href="#">
+                    <span class="material-symbols-outlined text-2xl">notifications</span>
+                    <span class="text-xl hidden lg:block">Notifications</span>
+                </a>
+                <a class="sidebar-link flex items-center gap-4 px-4 py-3 rounded-full hover:bg-white/10 transition-colors"
+                    href="#">
+                    <span class="material-symbols-outlined text-2xl">mail</span>
+                    <span class="text-xl hidden lg:block">Messages</span>
+                </a>
+                <a class="sidebar-link flex items-center gap-4 px-4 py-3 rounded-full hover:bg-white/10 transition-colors"
+                    href="#">
+                    <span class="material-symbols-outlined text-2xl">person</span>
+                    <span class="text-xl hidden lg:block">Profile</span>
+                </a>
+            </div>
+            <button
+                class="mt-6 w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 rounded-full transition-all active:scale-95 shadow-lg lg:block hidden">
+                Post
+            </button>
+            <button
+                class="mt-6 size-12 flex items-center justify-center bg-primary hover:bg-primary/90 text-white font-bold rounded-full transition-all active:scale-95 shadow-lg lg:hidden mx-auto">
+                <span class="material-symbols-outlined">edit</span>
+            </button>
+        </aside>
+        <section class="flex-1 max-w-[600px] border-r border-border-color min-h-screen" id="mainContent">
+            <div class="sticky top-14 z-40 glass-header border-b border-border-color">
+                <div class="flex text-center h-14">
+                    <button
+                        class="flex-1 hover:bg-white/10 transition-colors font-bold relative flex items-center justify-center">
+                        For You
+                        <div class="absolute bottom-0 h-1 w-16 bg-primary rounded-full"></div>
+                    </button>
+                    <button class="flex-1 hover:bg-white/10 transition-colors text-gray-500 font-medium">
+                        Following
+                    </button>
+                </div>
+            </div>
+            <div class="flex flex-col" id="postFeed">
+            </div>
+            <div class="p-8 text-center hidden" id="loadingState">
+                <div class="inline-block size-6 border-2 border-primary border-t-transparent rounded-full animate-spin">
+                </div>
+            </div>
+        </section>
+        <aside
+            class="hidden xl:block w-80 py-4 px-6 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto hide-scrollbar">
+            <div class="bg-[#16181c] rounded-2xl overflow-hidden mb-4">
+                <h3 class="px-4 py-3 text-xl font-extrabold">What's happening</h3>
+                <div class="flex flex-col" id="trendingPosts">
+                </div>
+                <a class="block px-4 py-3 text-primary text-sm hover:bg-white/5 transition-colors" href="#">Show
+                    more</a>
+            </div>
+            <div class="bg-[#16181c] rounded-2xl overflow-hidden border border-border-color">
+                <h3 class="px-4 py-3 text-xl font-extrabold">Categories</h3>
+                <div class="px-4 pb-4 flex flex-wrap gap-2">
+                    <a class="px-3 py-1 bg-black/40 border border-border-color rounded-full text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
+                        href="#">#Engineering</a>
+                    <a class="px-3 py-1 bg-black/40 border border-border-color rounded-full text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
+                        href="#">#UXDesign</a>
+                    <a class="px-3 py-1 bg-black/40 border border-border-color rounded-full text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
+                        href="#">#ReactJS</a>
+                    <a class="px-3 py-1 bg-black/40 border border-border-color rounded-full text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
+                        href="#">#WebPerf</a>
+                </div>
+            </div>
+            <footer class="mt-4 px-4 flex flex-wrap gap-x-3 gap-y-1">
+                <a class="text-[13px] text-gray-500 hover:underline" href="#">Terms of Service</a>
+                <a class="text-[13px] text-gray-500 hover:underline" href="#">Privacy Policy</a>
+                <a class="text-[13px] text-gray-500 hover:underline" href="#">Cookie Policy</a>
+                <span class="text-[13px] text-gray-500">© 2024 X-Blog Corp.</span>
+            </footer>
+        </aside>
+    </main>
+    <nav
+        class="fixed bottom-0 w-full glass-header border-t border-border-color flex justify-around py-3 md:hidden z-50">
+        <button class="text-primary" onclick="showHome()"><span
+                class="material-symbols-outlined text-2xl font-variation-fill">home</span></button>
+        <button class="text-white"><span class="material-symbols-outlined text-2xl">search</span></button>
+        <button class="text-white"><span class="material-symbols-outlined text-2xl">notifications</span></button>
+        <button class="text-white"><span class="material-symbols-outlined text-2xl">mail</span></button>
+    </nav>
+    <script>
+        // Sample Post Data
+        const posts = [
+            {
+                id: 1,
+                author: "X-Architecture",
+                handle: "@static_dev",
+                time: "2h",
+                title: "The Future of Static Site Architecture: Beyond SSG",
+                excerpt: "Exploring how modern static site generators are shifting the landscape of web development towards server-less edge computing and hydration-less islands.",
+                image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAPqCB3-xoYDdF4bmFOMtiHy6JCckL-xk59zKjSoSZrRh_K4BdwxNx_kowsOcI0GIjjfVPAqxd7gdeBX90Cm6scQ0qDq2zwePoputvuksnAqg1MKoNXR2CTJ2IZ_KqqLPCv1kaOO2JsXnotSxfOUDc2mT26EMXO9OvVuQPQxGKB-l0XSQdGJV5MXeBFE84D8OuvteRuMvrQcUtXS_3iyz1ZMQHX_ZZD6_NiDnO32gWbjYFNwztDNFM3cyu8MdehH0JYArRADUsbcA",
+                category: "Technology",
+                stats: { replies: "124", sync: "48", likes: "1.2k", views: "45k" }
+            },
+            {
+                id: 2,
+                author: "Design Systems",
+                handle: "@system_ui",
+                time: "5h",
+                title: "Minimalism in the Age of Chaos",
+                excerpt: "Why brutalist and minimalist web designs are winning the attention economy in 2024. A deep dive into user cognitive load.",
+                image: "https://lh3.googleusercontent.com/aida-public/AB6AXuB8SdOo0Bl5kaTqlpIOZ2fbwfAc0dDRB6iAo_X4XZ8DutW_GGkqBMkgAmmcspDZWLLQomIAfFLCilji3JZ3vfjsbnD_H2VBTMmrvdqjAD4zOOFJK6VYi_tlSvoEJ1ZtzBI-pEuuXmbMLt2N19CvFIAsoV2ZT6RpYt6_qaZ3-H-LpkJW8Mw52ljOwgvuWxgWYXEE7OcbVQ2ha-Y15k17U9QlpViUHiXhETd5dahuLSrfbAxtf3CvyS9r9edw7BjV7rJulcm654NNpQ",
+                category: "Design",
+                stats: { replies: "56", sync: "12", likes: "842", views: "12k" }
+            },
+            {
+                id: 3,
+                author: "Fullstack Weekly",
+                handle: "@fullstack",
+                time: "8h",
+                title: "10 Performance Tips for Serverless Functions",
+                excerpt: "Cold starts are the enemy. Here is how we reduced our latency by 80% using these simple architectural tweaks that most devs miss.",
+                image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDSnvoXec_FkXIVE3NM_E9YIFAdKb3k0Pay3m2UZT-xchihxAckAF3vXye1bCWiOMVzscWJ59j4Ukrx7SlH14pceSgPDjrEuEXuoaa7NixYD_WmBS-cWLU7_NHZh7Llt2Qj26Fn3QM5RR8P28F4e1hn_A0eMO8AjWuynf9SMaJ1oYc0Z3DSKXr8fi-JnIQsOIQzi1onB3nTzLkFUuzOjNy5dgMRrdUMIUT63-ufgSu1kYrKWP-BGmMFqJVTFN1uPIGFv1WeVmrnjQ",
+                category: "Development",
+                stats: { replies: "210", sync: "89", likes: "3.4k", views: "98k" }
+            }
+        ];
+        const trending = [
+            { category: "Technology · Trending", title: "Understanding Next.js App Router", reads: "2.4k" },
+            { category: "Development", title: "The rise of Tailwind v4", reads: "1.8k" },
+            { category: "Design", title: "Why dark mode is still king", reads: "5.1k" }
+        ];
+        function renderFeed(postsToRender) {
+            const feed = document.getElementById('postFeed');
+            feed.innerHTML = postsToRender.map(post => `
             <article class="p-4 border-b border-border-color hover:bg-white/[0.02] cursor-pointer transition-colors group post-card" onclick="viewArticle(${post.id})">
                 <div class="flex gap-4">
                     <div class="flex-shrink-0">
@@ -254,22 +281,22 @@
                 </div>
             </article>
         `).join('');
-    }
-    function renderTrending() {
-        const trendingContainer = document.getElementById('trendingPosts');
-        trendingContainer.innerHTML = trending.map(item => `
+        }
+        function renderTrending() {
+            const trendingContainer = document.getElementById('trendingPosts');
+            trendingContainer.innerHTML = trending.map(item => `
             <a href="#" class="px-4 py-3 hover:bg-white/5 transition-colors">
                 <p class="text-[13px] text-gray-500">${item.category}</p>
                 <p class="text-[15px] font-bold mt-0.5">${item.title}</p>
                 <p class="text-[13px] text-gray-500 mt-1">${item.reads} reads</p>
             </a>
         `).join('');
-    }
-    function viewArticle(id) {
-        const post = posts.find(p => p.id === id);
-        const main = document.getElementById('mainContent');
-        window.scrollTo(0,0);
-        main.innerHTML = `
+        }
+        function viewArticle(id) {
+            const post = posts.find(p => p.id === id);
+            const main = document.getElementById('mainContent');
+            window.scrollTo(0, 0);
+            main.innerHTML = `
             <div class="sticky top-14 z-40 glass-header border-b border-border-color flex items-center gap-8 px-4 h-14">
                 <button onclick="showHome()" class="p-2 -ml-2 hover:bg-white/10 rounded-full transition-colors">
                     <span class="material-symbols-outlined">arrow_back</span>
@@ -304,24 +331,124 @@
                 </div>
             </article>
         `;
-    }
-    function showHome() {
-        location.reload(); // Simple reload for returning home
-    }
-    // Search functionality
-    document.getElementById('searchInput').addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase();
-        const filteredPosts = posts.filter(post => 
-            post.title.toLowerCase().includes(query) || 
-            post.excerpt.toLowerCase().includes(query)
-        );
-        renderFeed(filteredPosts);
-    });
-    // Initialize
-    window.onload = () => {
-        renderFeed(posts);
-        renderTrending();
-    };
-</script>
+        }
+        function showHome() {
+            location.reload(); // Simple reload for returning home
+        }
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const filteredPosts = posts.filter(post =>
+                post.title.toLowerCase().includes(query) ||
+                post.excerpt.toLowerCase().includes(query)
+            );
+            renderFeed(filteredPosts);
+        });
+        // Initialize
+        window.onload = () => {
+            renderFeed(posts);
+            renderTrending();
+        };
+    </script>
+    <script>
+        const REPO = 'postavshikioptom/multiverse_decapcms';
+        const BRANCH = 'main';
+        const POSTS_FOLDER = 'content/posts';
+        const TARGET_SITE = 'maxmarshall';  // Твой фильтр, меняй per сайт
 
-</body></html>
+        async function loadPosts() {
+            // Шаг 1: Получить список файлов постов via GitHub API
+            const listUrl = `https://api.github.com/repos/${REPO}/contents/${POSTS_FOLDER}?ref=${BRANCH}`;
+            const response = await fetch(listUrl);
+            if (!response.ok) { console.error('Ошибка API'); return []; }
+            const files = await response.json();
+
+            // Шаг 2: Fetch каждый raw .md и parse frontmatter + body
+            const posts = [];
+            for (const file of files) {
+                if (file.name.endsWith('.md')) {
+                    const rawUrl = file.download_url;  // Или https://raw.githubusercontent.com/... 
+                    const text = await fetch(rawUrl).then(res => res.text());
+
+                    // Простой parse frontmatter (regex, без libs)
+                    const frontmatterMatch = text.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+                    if (frontmatterMatch) {
+                        const fm = {};
+                        frontmatterMatch[1].split('\n').forEach(line => {
+                            const [key, value] = line.split(': ').map(s => s.trim());
+                            if (key) fm[key] = value.replace(/^["']|["']$/g, '');  // Убираем кавычки
+                        });
+                        if (fm.target_site === TARGET_SITE || !fm.target_site) {  // Фильтр по сайту
+                            posts.push({
+                                title: fm.title || file.name,
+                                description: fm.description || '',
+                                date: new Date(fm.date || file.name.substring(0, 10)),
+                                slug: file.name.replace('.md', ''),
+                                body: frontmatterMatch[2].trim(),  // Полный текст для детальной страницы
+                                url: `#post/${file.name.replace('.md', '')}`  // Хэш для client-routing
+                            });
+                        }
+                    }
+                }
+            }
+
+            // Шаг 3: Сортировка по дате (новые сверху)
+            posts.sort((a, b) => b.date - a.date);
+
+            return posts;
+        }
+
+        // Рендер последнего поста на главной
+        async function renderLatestPost() {
+            const posts = await loadPosts();
+            if (posts.length === 0) return;
+
+            const latest = posts[0];  // Самый новый
+            const html = `
+         <article class="latest-post">
+           <h2><a href="${latest.url}">${latest.title}</a></h2>
+           <p>${latest.description}</p>
+           <small>Дата: ${latest.date.toLocaleDateString('ru-RU')}</small>
+         </article>
+       `;
+            document.getElementById('latest-post').innerHTML = html;
+        }
+
+        // Рендер бокового меню (последние 10 постов)
+        async function renderSidebarMenu() {
+            const posts = await loadPosts();
+            const menuHtml = posts.slice(0, 10).map(post =>
+                `<li><a href="${post.url}">${post.title}</a> <small>(${post.date.toLocaleDateString('ru-RU')})</small></li>`
+            ).join('');
+            document.getElementById('sidebar-menu').innerHTML = `<ul>${menuHtml}</ul>`;
+        }
+
+        // Client-side routing: Показ детального поста по клику (без перезагрузки)
+        function handleRouting() {
+            const hash = window.location.hash.substring(1);  // #post/slug
+            if (hash.startsWith('post/')) {
+                const slug = hash.substring(5);
+                loadPosts().then(posts => {
+                    const post = posts.find(p => p.slug.includes(slug));
+                    if (post) {
+                        document.body.innerHTML = `<h1>${post.title}</h1><p>${post.description}</p><div>${marked.parse(post.body)}</div><a href="/">Назад</a>`;
+                    }
+                });
+            }
+        }
+
+        // Запуск
+        window.addEventListener('load', () => {
+            renderLatestPost();
+            renderSidebarMenu();
+        });
+        window.addEventListener('hashchange', handleRouting);  // Для ссылок
+
+        // Опционально: CDN для Markdown parse (если body в Markdown)
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+        document.head.appendChild(script);
+    </script>
+</body>
+
+</html>
