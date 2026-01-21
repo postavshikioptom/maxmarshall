@@ -57,6 +57,7 @@
             }
         }
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 
 <body class="bg-black text-white antialiased">
@@ -186,268 +187,176 @@
         <button class="text-white"><span class="material-symbols-outlined text-2xl">mail</span></button>
     </nav>
     <script>
-        // Sample Post Data
-        const posts = [
-            {
-                id: 1,
-                author: "X-Architecture",
-                handle: "@static_dev",
-                time: "2h",
-                title: "The Future of Static Site Architecture: Beyond SSG",
-                excerpt: "Exploring how modern static site generators are shifting the landscape of web development towards server-less edge computing and hydration-less islands.",
-                image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAPqCB3-xoYDdF4bmFOMtiHy6JCckL-xk59zKjSoSZrRh_K4BdwxNx_kowsOcI0GIjjfVPAqxd7gdeBX90Cm6scQ0qDq2zwePoputvuksnAqg1MKoNXR2CTJ2IZ_KqqLPCv1kaOO2JsXnotSxfOUDc2mT26EMXO9OvVuQPQxGKB-l0XSQdGJV5MXeBFE84D8OuvteRuMvrQcUtXS_3iyz1ZMQHX_ZZD6_NiDnO32gWbjYFNwztDNFM3cyu8MdehH0JYArRADUsbcA",
-                category: "Technology",
-                stats: { replies: "124", sync: "48", likes: "1.2k", views: "45k" }
-            },
-            {
-                id: 2,
-                author: "Design Systems",
-                handle: "@system_ui",
-                time: "5h",
-                title: "Minimalism in the Age of Chaos",
-                excerpt: "Why brutalist and minimalist web designs are winning the attention economy in 2024. A deep dive into user cognitive load.",
-                image: "https://lh3.googleusercontent.com/aida-public/AB6AXuB8SdOo0Bl5kaTqlpIOZ2fbwfAc0dDRB6iAo_X4XZ8DutW_GGkqBMkgAmmcspDZWLLQomIAfFLCilji3JZ3vfjsbnD_H2VBTMmrvdqjAD4zOOFJK6VYi_tlSvoEJ1ZtzBI-pEuuXmbMLt2N19CvFIAsoV2ZT6RpYt6_qaZ3-H-LpkJW8Mw52ljOwgvuWxgWYXEE7OcbVQ2ha-Y15k17U9QlpViUHiXhETd5dahuLSrfbAxtf3CvyS9r9edw7BjV7rJulcm654NNpQ",
-                category: "Design",
-                stats: { replies: "56", sync: "12", likes: "842", views: "12k" }
-            },
-            {
-                id: 3,
-                author: "Fullstack Weekly",
-                handle: "@fullstack",
-                time: "8h",
-                title: "10 Performance Tips for Serverless Functions",
-                excerpt: "Cold starts are the enemy. Here is how we reduced our latency by 80% using these simple architectural tweaks that most devs miss.",
-                image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDSnvoXec_FkXIVE3NM_E9YIFAdKb3k0Pay3m2UZT-xchihxAckAF3vXye1bCWiOMVzscWJ59j4Ukrx7SlH14pceSgPDjrEuEXuoaa7NixYD_WmBS-cWLU7_NHZh7Llt2Qj26Fn3QM5RR8P28F4e1hn_A0eMO8AjWuynf9SMaJ1oYc0Z3DSKXr8fi-JnIQsOIQzi1onB3nTzLkFUuzOjNy5dgMRrdUMIUT63-ufgSu1kYrKWP-BGmMFqJVTFN1uPIGFv1WeVmrnjQ",
-                category: "Development",
-                stats: { replies: "210", sync: "89", likes: "3.4k", views: "98k" }
+        const REPO = 'postavshikioptom/multiverse_decapcms';
+        const BRANCH = 'main';
+        const POSTS_FOLDER = 'content/posts';
+        const TARGET_SITE = 'maxmarshall';
+
+        async function loadPosts() {
+            const cacheKey = 'posts_cache_maxmarshall';
+            const cached = localStorage.getItem(cacheKey);
+            if (cached) {
+                const { data, timestamp } = JSON.parse(cached);
+                if (Date.now() - timestamp < 86400000) {
+                    return data.map(p => ({ ...p, date: new Date(p.date) }));
+                }
             }
-        ];
+
+            try {
+                const listUrl = `https://api.github.com/repos/${REPO}/contents/${POSTS_FOLDER}?ref=${BRANCH}`;
+                const response = await fetch(listUrl);
+                if (!response.ok) return [];
+
+                const files = await response.json();
+                const posts = [];
+
+                for (const file of files) {
+                    if (file.name.endsWith('.md')) {
+                        const rawUrl = file.download_url;
+                        const text = await fetch(rawUrl).then(res => res.text());
+
+                        const frontmatterMatch = text.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+                        if (frontmatterMatch) {
+                            const fm = {};
+                            frontmatterMatch[1].split('\n').forEach(line => {
+                                const parts = line.split(': ');
+                                const key = parts[0];
+                                const value = parts.slice(1).join(': ');
+                                if (key) fm[key.trim()] = (value || '').trim().replace(/^["']|["']$/g, '');
+                            });
+
+                            if (fm.target_site === TARGET_SITE || !fm.target_site) {
+                                posts.push({
+                                    title: fm.title || 'Без заголовка',
+                                    description: fm.description || '',
+                                    date: new Date(fm.date || '2026-01-01'),
+                                    slug: fm.slug || file.name.replace('.md', ''),
+                                    media: fm.media || '',
+                                    body: marked.parse(frontmatterMatch[2].trim())
+                                });
+                            }
+                        }
+                    }
+                }
+
+                posts.sort((a, b) => b.date - a.date);
+                localStorage.setItem(cacheKey, JSON.stringify({ data: posts, timestamp: Date.now() }));
+                return posts;
+            } catch (error) {
+                console.error('Error loading posts:', error);
+                return [];
+            }
+        }
+
+        async function renderFeed() {
+            const feedContainer = document.getElementById('postFeed');
+            const loadingState = document.getElementById('loadingState');
+            
+            loadingState.classList.remove('hidden');
+            feedContainer.innerHTML = '';
+
+            const posts = await loadPosts();
+            loadingState.classList.add('hidden');
+
+            if (posts.length === 0) {
+                feedContainer.innerHTML = '<p class="p-8 text-center text-gray-500">Нет постов</p>';
+                return;
+            }
+
+            const limited = posts.slice(0, 50);
+            feedContainer.innerHTML = limited.map(post => `
+                <article class="p-4 border-b border-border-color hover:bg-white/[0.02] cursor-pointer transition-colors group post-card">
+                    <div class="flex gap-4">
+                        <div class="flex-shrink-0">
+                            <div class="size-10 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+                                <span class="material-symbols-outlined text-xl">person</span>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center gap-1 text-[15px] mb-0.5">
+                                <span class="font-bold text-white hover:underline">Max Marshall</span>
+                                <span class="text-gray-500">@max · ${post.date.toLocaleDateString('ru-RU')}</span>
+                            </div>
+                            <h3 class="text-[17px] font-bold leading-tight post-title transition-colors mb-2">
+                                <a href="/${post.slug}" class="block">${post.title}</a>
+                            </h3>
+                            <p class="text-[#71767b] text-[15px] leading-normal mb-3">
+                                ${post.description}
+                            </p>
+                            ${post.media ? `
+                            <div class="rounded-2xl overflow-hidden border border-border-color mb-3">
+                                <div class="aspect-[1.91/1] bg-center bg-cover bg-[#16181c]" style="background-image: url('${post.media}')"></div>
+                            </div>
+                            ` : ''}
+                            <div class="flex items-center justify-between text-gray-500 max-w-md -ml-2">
+                                <button class="flex items-center gap-2 hover:text-primary transition-colors group p-2 rounded-full hover:bg-primary/10">
+                                    <span class="material-symbols-outlined text-[18px]">chat_bubble</span>
+                                    <span class="text-xs">0</span>
+                                </button>
+                                <button class="flex items-center gap-2 hover:text-green-500 transition-colors group p-2 rounded-full hover:bg-green-500/10">
+                                    <span class="material-symbols-outlined text-[18px]">sync</span>
+                                    <span class="text-xs">0</span>
+                                </button>
+                                <button class="flex items-center gap-2 hover:text-pink-500 transition-colors group p-2 rounded-full hover:bg-pink-500/10">
+                                    <span class="material-symbols-outlined text-[18px]">favorite</span>
+                                    <span class="text-xs">0</span>
+                                </button>
+                                <button class="flex items-center gap-2 hover:text-primary transition-colors group p-2 rounded-full hover:bg-primary/10">
+                                    <span class="material-symbols-outlined text-[18px]">bar_chart</span>
+                                    <span class="text-xs">0</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+        }
+
         const trending = [
             { category: "Technology · Trending", title: "Understanding Next.js App Router", reads: "2.4k" },
             { category: "Development", title: "The rise of Tailwind v4", reads: "1.8k" },
             { category: "Design", title: "Why dark mode is still king", reads: "5.1k" }
         ];
-        function renderFeed(postsToRender) {
-            const feed = document.getElementById('postFeed');
-            feed.innerHTML = postsToRender.map(post => `
-            <article class="p-4 border-b border-border-color hover:bg-white/[0.02] cursor-pointer transition-colors group post-card" onclick="viewArticle(${post.id})">
-                <div class="flex gap-4">
-                    <div class="flex-shrink-0">
-                        <div class="size-10 rounded-full bg-primary/20 flex items-center justify-center text-primary">
-                            <span class="material-symbols-outlined text-xl">person</span>
-                        </div>
-                    </div>
-                    <div class="flex-1">
-                        <div class="flex items-center gap-1 text-[15px] mb-0.5">
-                            <span class="font-bold text-white hover:underline">${post.author}</span>
-                            <span class="text-gray-500">${post.handle} · ${post.time}</span>
-                        </div>
-                        <h3 class="text-[17px] font-bold leading-tight post-title transition-colors mb-2">${post.title}</h3>
-                        <p class="text-[#71767b] text-[15px] leading-normal mb-3">
-                            ${post.excerpt}
-                        </p>
-                        ${post.image ? `
-                        <div class="rounded-2xl overflow-hidden border border-border-color mb-3">
-                            <div class="aspect-[1.91/1] bg-center bg-cover bg-[#16181c]" style="background-image: url('${post.image}')"></div>
-                        </div>
-                        ` : ''}
-                        <div class="flex items-center justify-between text-gray-500 max-w-md -ml-2">
-                            <button class="flex items-center gap-2 hover:text-primary transition-colors group p-2 rounded-full hover:bg-primary/10">
-                                <span class="material-symbols-outlined text-[18px]">chat_bubble</span>
-                                <span class="text-xs">${post.stats.replies}</span>
-                            </button>
-                            <button class="flex items-center gap-2 hover:text-green-500 transition-colors group p-2 rounded-full hover:bg-green-500/10">
-                                <span class="material-symbols-outlined text-[18px]">sync</span>
-                                <span class="text-xs">${post.stats.sync}</span>
-                            </button>
-                            <button class="flex items-center gap-2 hover:text-pink-500 transition-colors group p-2 rounded-full hover:bg-pink-500/10">
-                                <span class="material-symbols-outlined text-[18px]">favorite</span>
-                                <span class="text-xs">${post.stats.likes}</span>
-                            </button>
-                            <button class="flex items-center gap-2 hover:text-primary transition-colors group p-2 rounded-full hover:bg-primary/10">
-                                <span class="material-symbols-outlined text-[18px]">bar_chart</span>
-                                <span class="text-xs">${post.stats.views}</span>
-                            </button>
-                            <div class="flex items-center gap-1">
-                                <button class="p-2 rounded-full hover:bg-primary/10 hover:text-primary transition-colors">
-                                    <span class="material-symbols-outlined text-[18px]">bookmark</span>
-                                </button>
-                                <button class="p-2 rounded-full hover:bg-primary/10 hover:text-primary transition-colors">
-                                    <span class="material-symbols-outlined text-[18px]">share</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </article>
-        `).join('');
-        }
+
         function renderTrending() {
             const trendingContainer = document.getElementById('trendingPosts');
+            if (!trendingContainer) return;
             trendingContainer.innerHTML = trending.map(item => `
-            <a href="#" class="px-4 py-3 hover:bg-white/5 transition-colors">
-                <p class="text-[13px] text-gray-500">${item.category}</p>
-                <p class="text-[15px] font-bold mt-0.5">${item.title}</p>
-                <p class="text-[13px] text-gray-500 mt-1">${item.reads} reads</p>
-            </a>
-        `).join('');
+                <a href="#" class="px-4 py-3 hover:bg-white/5 transition-colors">
+                    <p class="text-[13px] text-gray-500">${item.category}</p>
+                    <p class="text-[15px] font-bold mt-0.5">${item.title}</p>
+                    <p class="text-[13px] text-gray-500 mt-1">${item.reads} reads</p>
+                </a>
+            `).join('');
         }
-        function viewArticle(id) {
-            const post = posts.find(p => p.id === id);
-            const main = document.getElementById('mainContent');
-            window.scrollTo(0, 0);
-            main.innerHTML = `
-            <div class="sticky top-14 z-40 glass-header border-b border-border-color flex items-center gap-8 px-4 h-14">
-                <button onclick="showHome()" class="p-2 -ml-2 hover:bg-white/10 rounded-full transition-colors">
-                    <span class="material-symbols-outlined">arrow_back</span>
-                </button>
-                <h2 class="text-xl font-bold">Post</h2>
-            </div>
-            <article class="p-4">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="size-12 rounded-full bg-primary/20 flex items-center justify-center text-primary flex-shrink-0">
-                        <span class="material-symbols-outlined text-2xl">person</span>
-                    </div>
-                    <div>
-                        <p class="font-bold text-base">${post.author}</p>
-                        <p class="text-gray-500 text-sm">${post.handle}</p>
-                    </div>
-                </div>
-                <h1 class="text-2xl font-bold mb-4">${post.title}</h1>
-                <p class="text-[17px] text-white leading-relaxed mb-4">${post.excerpt}</p>
-                <p class="text-[17px] text-white leading-relaxed mb-6">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                <img src="${post.image}" class="w-full rounded-2xl border border-border-color mb-6" alt="Post cover">
-                <div class="py-4 border-y border-border-color flex gap-4 text-sm text-gray-500 mb-4">
-                    <span>9:42 PM · Oct 24, 2023</span>
-                    <span>·</span>
-                    <span class="text-white"><strong>45.2K</strong> Views</span>
-                </div>
-                <div class="flex items-center justify-around py-2 border-b border-border-color text-gray-500">
-                    <button class="hover:text-primary"><span class="material-symbols-outlined">chat_bubble</span></button>
-                    <button class="hover:text-green-500"><span class="material-symbols-outlined">sync</span></button>
-                    <button class="hover:text-pink-500"><span class="material-symbols-outlined">favorite</span></button>
-                    <button class="hover:text-primary"><span class="material-symbols-outlined">bookmark</span></button>
-                    <button class="hover:text-primary"><span class="material-symbols-outlined">share</span></button>
-                </div>
-            </article>
-        `;
-        }
+
         function showHome() {
-            location.reload(); // Simple reload for returning home
+            window.location.href = '/';
         }
-        // Search functionality
-        document.getElementById('searchInput').addEventListener('input', (e) => {
+
+        document.getElementById('searchInput').addEventListener('input', async (e) => {
             const query = e.target.value.toLowerCase();
+            const posts = await loadPosts();
             const filteredPosts = posts.filter(post =>
                 post.title.toLowerCase().includes(query) ||
-                post.excerpt.toLowerCase().includes(query)
+                post.description.toLowerCase().includes(query)
             );
-            renderFeed(filteredPosts);
+            
+            const feedContainer = document.getElementById('postFeed');
+            feedContainer.innerHTML = filteredPosts.map(post => `
+                <article class="p-4 border-b border-border-color hover:bg-white/[0.02] cursor-pointer transition-colors group post-card">
+                    <h3 class="text-[17px] font-bold leading-tight post-title transition-colors mb-2">
+                        <a href="/${post.slug}" class="block">${post.title}</a>
+                    </h3>
+                    <p class="text-[#71767b] text-[15px] leading-normal mb-3">${post.description}</p>
+                </article>
+            `).join('');
         });
-        // Initialize
-        window.onload = () => {
-            renderFeed(posts);
-            renderTrending();
-        };
-    </script>
-    <script>
-        const REPO = 'postavshikioptom/multiverse_decapcms';
-        const BRANCH = 'main';
-        const POSTS_FOLDER = 'content/posts';
-        const TARGET_SITE = 'maxmarshall';  // Твой фильтр, меняй per сайт
 
-        async function loadPosts() {
-            // Шаг 1: Получить список файлов постов via GitHub API
-            const listUrl = `https://api.github.com/repos/${REPO}/contents/${POSTS_FOLDER}?ref=${BRANCH}`;
-            const response = await fetch(listUrl);
-            if (!response.ok) { console.error('Ошибка API'); return []; }
-            const files = await response.json();
-
-            // Шаг 2: Fetch каждый raw .md и parse frontmatter + body
-            const posts = [];
-            for (const file of files) {
-                if (file.name.endsWith('.md')) {
-                    const rawUrl = file.download_url;  // Или https://raw.githubusercontent.com/... 
-                    const text = await fetch(rawUrl).then(res => res.text());
-
-                    // Простой parse frontmatter (regex, без libs)
-                    const frontmatterMatch = text.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
-                    if (frontmatterMatch) {
-                        const fm = {};
-                        frontmatterMatch[1].split('\n').forEach(line => {
-                            const [key, value] = line.split(': ').map(s => s.trim());
-                            if (key) fm[key] = value.replace(/^["']|["']$/g, '');  // Убираем кавычки
-                        });
-                        if (fm.target_site === TARGET_SITE || !fm.target_site) {  // Фильтр по сайту
-                            posts.push({
-                                title: fm.title || file.name,
-                                description: fm.description || '',
-                                date: new Date(fm.date || file.name.substring(0, 10)),
-                                slug: file.name.replace('.md', ''),
-                                body: frontmatterMatch[2].trim(),  // Полный текст для детальной страницы
-                                url: `#post/${file.name.replace('.md', '')}`  // Хэш для client-routing
-                            });
-                        }
-                    }
-                }
-            }
-
-            // Шаг 3: Сортировка по дате (новые сверху)
-            posts.sort((a, b) => b.date - a.date);
-
-            return posts;
-        }
-
-        // Рендер последнего поста на главной
-        async function renderLatestPost() {
-            const posts = await loadPosts();
-            if (posts.length === 0) return;
-
-            const latest = posts[0];  // Самый новый
-            const html = `
-         <article class="latest-post">
-           <h2><a href="${latest.url}">${latest.title}</a></h2>
-           <p>${latest.description}</p>
-           <small>Дата: ${latest.date.toLocaleDateString('ru-RU')}</small>
-         </article>
-       `;
-            document.getElementById('latest-post').innerHTML = html;
-        }
-
-        // Рендер бокового меню (последние 10 постов)
-        async function renderSidebarMenu() {
-            const posts = await loadPosts();
-            const menuHtml = posts.slice(0, 10).map(post =>
-                `<li><a href="${post.url}">${post.title}</a> <small>(${post.date.toLocaleDateString('ru-RU')})</small></li>`
-            ).join('');
-            document.getElementById('sidebar-menu').innerHTML = `<ul>${menuHtml}</ul>`;
-        }
-
-        // Client-side routing: Показ детального поста по клику (без перезагрузки)
-        function handleRouting() {
-            const hash = window.location.hash.substring(1);  // #post/slug
-            if (hash.startsWith('post/')) {
-                const slug = hash.substring(5);
-                loadPosts().then(posts => {
-                    const post = posts.find(p => p.slug.includes(slug));
-                    if (post) {
-                        document.body.innerHTML = `<h1>${post.title}</h1><p>${post.description}</p><div>${marked.parse(post.body)}</div><a href="/">Назад</a>`;
-                    }
-                });
-            }
-        }
-
-        // Запуск
         window.addEventListener('load', () => {
-            renderLatestPost();
-            renderSidebarMenu();
+            renderFeed();
+            renderTrending();
         });
-        window.addEventListener('hashchange', handleRouting);  // Для ссылок
-
-        // Опционально: CDN для Markdown parse (если body в Markdown)
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
-        document.head.appendChild(script);
     </script>
 </body>
 

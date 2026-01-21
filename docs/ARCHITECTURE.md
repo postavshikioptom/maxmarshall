@@ -84,8 +84,8 @@ The architecture is now fully defined. This plan ensures that the "child" site r
 - Кэш: localStorage (24 часа).
 - SEO: Динамически обновлять <title>, <meta description>, og:tags в JS.
 
-[ ] **Задача 2.0: Создать .htaccess (Для Чистых URL) **
-Подзадача 2.0.1: Создать файл .htaccess в корне сайта (на ПК, затем FTP в корень maxmarshall.indevs.in).
+✅ ЗАВЕРШЕНО **Задача 2.0: Создать .htaccess (Для Чистых URL) **
+Подзадача 2.0.1: ✅ ЗАВЕРШЕНО Создать файл .htaccess в корне сайта (на ПК, затем FTP в корень maxmarshall.indevs.in).
    - Содержимое:
      ```
      RewriteEngine On
@@ -103,16 +103,16 @@ The architecture is now fully defined. This plan ensures that the "child" site r
      ```
    - Почему: URL /moy-slug → сервер отдаёт post.html, но браузер видит чистый /moy-slug. JS читает slug из location.pathname.substring(1).
 
-Подзадача 2.0.2: Загрузить .htaccess по FTP (убедись, что хостинг поддерживает Apache/.htaccess — стандарт для shared).
+Подзадача 2.0.2: ✅ ЗАВЕРШЕНО Загрузить .htaccess по FTP (убедись, что хостинг поддерживает Apache/.htaccess — стандарт для shared).
 
-[ ] **Задача 2.1: Общие Изменения (Для index.html и post.html)**
-Подзадача 2.1.1: Добавить marked.js CDN в <head> обоих файлов.
+✅ ЗАВЕРШЕНО **Задача 2.1: Общие Изменения (Для index.html и post.html)**
+Подзадача 2.1.1: ✅ ЗАВЕРШЕНО Добавить marked.js CDN в <head> обоих файлов.
    - Вставить перед </head>:
      ```html
      <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
      ```
 
-Подзадача 2.1.2: Добавить общую функцию loadPosts() в <script> в конце <body> обоих файлов.
+Подзадача 2.1.2: ✅ ЗАВЕРШЕНО Добавить общую функцию loadPosts() в <script> в конце <body> обоих файлов.
    - Код (адаптирован под фильтр и slug):
      ```js
      const REPO = 'postavshikioptom/multiverse_decapcms';
@@ -169,8 +169,8 @@ The architecture is now fully defined. This plan ensures that the "child" site r
      }
      ```
 
-[ ] **Задача 2.2: Изменения в index.html (Главная Лента)**
-Подзадача 2.2.1: Заменить статический const posts = [...] на динамический рендер.
+✅ ЗАВЕРШЕНО **Задача 2.2: Изменения в index.html (Главная Лента)**
+Подзадача 2.2.1: ✅ ЗАВЕРШЕНО Заменить статический const posts = [...] на динамический рендер.
    - Найти весь блок // Sample Post Data и массив posts.
    - Заменить на:
      ```js
@@ -198,18 +198,18 @@ The architecture is now fully defined. This plan ensures that the "child" site r
      ```
    - Ссылки: href="/${post.slug}" — чистый URL (работает с .htaccess).
 
-Подзадача 2.2.2: Добавить loading.
+Подзадача 2.2.2: ✅ ЗАВЕРШЕНО Добавить loading.
    - В контейнер ленты: <p id="loading">Загрузка постов...</p>
    - В JS: Скрыть после render.
 
-[ ] **Задача 2.3: Изменения в post.html (Единый Шаблон Детального Поста)**
-Подзадача 2.3.1: Заменить статический контент на динамический.
+✅ ЗАВЕРШЕНО **Задача 2.3: Изменения в post.html (Единый Шаблон Детального Поста)**
+Подзадача 2.3.1: ✅ ЗАВЕРШЕНО Заменить статический контент на динамический.
    - Найти <div class="mb-6"> (title + description) → добавить id="post-header".
    - Найти featured image div → id="featured-image".
    - Найти <article class="article-content"> → id="post-body".
    - Убрать весь статический текст внутри этих блоков (оставь placeholders: "Загрузка...").
 
-Подзадача 2.3.2: Добавить JS для рендера по slug из pathname.
+Подзадача 2.3.2: ✅ ЗАВЕРШЕНО Добавить JS для рендера по slug из pathname.
    - В <script> в конце:
      ```js
      function getSlug() {
@@ -254,6 +254,6 @@ The architecture is now fully defined. This plan ensures that the "child" site r
      window.addEventListener('load', renderPost);
      ```
 
-Подзадача 2.3.3: Кнопка назад.
+Подзадача 2.3.3: ✅ ЗАВЕРШЕНО Кнопка назад.
    - В конец post-body: `<button onclick="history.back()" class="...">← Назад</button>`
 
