@@ -66,51 +66,76 @@ The architecture is now fully defined. This plan ensures that the "child" site r
 Что нужно сделать дальше?
 ===========
 # ФАЗА 2: Код подгурзки постов с Decamp CMS
+# Обновлённый Подробный План Реализации Интеграции Decap CMS с Дочерним Сайтом (maxmarshall.indevs.in)
 
-Этот план предназначен для другой AI-модели кодера (например, GitHub Copilot, Cursor или подобной), чтобы реализовать динамическую подгрузку постов из Decap CMS GitHub-repo (https://github.com/postavshikioptom/multiverse_decapcms) в репозитории дочернего сайта (https://github.com/postavshikioptom/maxmarshall). План основан на анализе структуры repo: файлы index.html (главная страница с лентой постов), post.html (шаблон детального поста), post-1-тестовый сгенерировал.html (пример сгенерированного поста), .gitignore и папка docs (возможно, для документации). Нет отдельных CSS/JS-файлов — всё inline в HTML.
+Этот план для другой AI-модели кодера. Основан на репозитории https://github.com/postavshikioptom/maxmarshall (файлы: index.html — главная лента, post.html — шаблон детального поста, примеры сгенерированных файлов). Всё на vanilla HTML/JS, Tailwind CDN, без фреймворков/npm/серверов.
 
-**Общая Архитектура**:
-- **Client-side rendering**: Vanilla JS (без фреймворков, библиотек или npm) fetch'ит посты из GitHub API/raw файлов Decap CMS. Нет сервера/BД на под-сайте — всё статическое.
-- **Данные постов**: Из /content/posts/ в Decap repo. Каждый пост — .md файл с frontmatter (title, description, date, media, body, slug, target_site).
-- **Фильтр**: Только посты с target_site = 'maxmarshall' (из frontmatter).
-- **Главная (index.html)**: Лента последних 50 постов (превью-карточки, как в твоём sample data). Сохранить прокрутку (если имеется infinite scroll или простая прокрутка — адаптировать).
-- **Детальный пост (post.html)**: По URL post.html?slug=moy-slug (или #slug=moy-slug для hash-routing). JS заменяет статический контент внутри <div class="mb-6"> и <article class="article-content"> на динамический из GitHub. Новый пост из CMS автоматически появляется по новому slug (без создания новых файлов — один post.html для всех).
-- **URL/slug**: Из поля slug в frontmatter (как настроено в config.yml Decap). Читаемые URL: maxmarshall.indevs.in/post.html?slug=moy-chitayemyy-url.
-- **Markdown**: Body — Markdown, парсить в HTML с marked.js (CDN).
-- **Ошибки**: Обработать 404, loading states.
-- **SEO/Производительность**: Добавить meta-теги динамически; кэш в localStorage для оффлайн/скорости.
+Ключевые Новые Требования (обновления):
+- Дизайн детальных постов: Использовать post.html как единый шаблон для ВСЕХ постов (старых и новых). JS в post.html динамически заменяет только контент (title, description, featured image, body, tags и т.д.). Когда редактируешь post.html (CSS, хедер, сайдбар, социальные кнопки) — все посты автоматически получают новый дизайн (при reload).
+- Чистые читаемые URL: maxmarshall.indevs.in/moy-slug (без post.html, без ?slug=, без .html).
+- Реализация URL: Через .htaccess (Apache rewrite) — все /slug → отдаёт post.html, JS читает slug из location.pathname.
+- Главная (index.html): Лента последних 50 постов (превью-карточки в стиле твоего sample data). Ссылки на посты: href="/moy-slug" (чистый URL).
+- Данные: Из Decap repo (https://github.com/postavshikioptom/multiverse_decapcms). Фильтр по target_site = 'maxmarshall'. Slug из frontmatter.
+- Markdown: Body → HTML с marked.js CDN.
+- Нет отдельных файлов: Один index.html (лента), один post.html (все детальные посты).
 
-**Предположения**:
-- Decap config.yml настроен с полями: slug, title, description, date, media (image/video), body (markdown), target_site.
-- Под-сайт на shared хостинге (FTP-загрузка файлов).
-- Тестировать в браузере (F12 console для ошибок).
+Общая Архитектура:
+- Client-side: JS fetch из GitHub API/raw.
+- Кэш: localStorage (24 часа).
+- SEO: Динамически обновлять <title>, <meta description>, og:tags в JS.
 
-**Инструменты для кодера**: Vanilla JS, fetch API, RegExp для parse frontmatter. CDN для marked.js (Markdown → HTML). Нет npm.
+[ ] **Задача 2.0: Создать .htaccess (Для Чистых URL) **
+Подзадача 2.0.1: Создать файл .htaccess в корне сайта (на ПК, затем FTP в корень maxmarshall.indevs.in).
+   - Содержимое:
+     ```
+     RewriteEngine On
 
-[ ] Задача 1: Общие Подготовительные Изменения (Для Обоих Файлов)
-Подзадача 1.1: Добавить CDN для marked.js (в <head> обоих HTML).
-   - Вставить: `<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>`.
-   - Почему: Для парсинга body (Markdown → HTML).
+     # Если файл или папка реально существует (index.html, assets) — отдавать напрямую
+     RewriteCond %{REQUEST_FILENAME} -f [OR]
+     RewriteCond %{REQUEST_FILENAME} -d
+     RewriteRule ^ - [L]
 
-[ ]Подзадача 1.2: Создать общую JS-функцию loadPosts() (в <script> в конце <body> обоих файлов).
-   - Это асинхронная функция для fetch списка постов и parse.
-   - Код:
+     # Главная / → index.html
+     RewriteRule ^$ index.html [L]
+
+     # Все остальные пути (slug) → post.html с query slug
+     RewriteRule ^([^/]+)/?$ post.html?slug=$1 [QSA,L]
+     ```
+   - Почему: URL /moy-slug → сервер отдаёт post.html, но браузер видит чистый /moy-slug. JS читает slug из location.pathname.substring(1).
+
+Подзадача 2.0.2: Загрузить .htaccess по FTP (убедись, что хостинг поддерживает Apache/.htaccess — стандарт для shared).
+
+[ ] **Задача 2.1: Общие Изменения (Для index.html и post.html)**
+Подзадача 2.1.1: Добавить marked.js CDN в <head> обоих файлов.
+   - Вставить перед </head>:
+     ```html
+     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+     ```
+
+Подзадача 2.1.2: Добавить общую функцию loadPosts() в <script> в конце <body> обоих файлов.
+   - Код (адаптирован под фильтр и slug):
      ```js
      const REPO = 'postavshikioptom/multiverse_decapcms';
      const BRANCH = 'main';
      const POSTS_FOLDER = 'content/posts';
-     const TARGET_SITE = 'maxmarshall';  // Фикс для этого сайта
+     const TARGET_SITE = 'maxmarshall';
 
      async function loadPosts() {
-       const listUrl = `https://api.github.com/repos/${REPO}/contents/${POSTS_FOLDER}?ref=${BRANCH}`;
-       const response = await fetch(listUrl, { headers: { 'Accept': 'application/vnd.github.v3+json' } });
-       if (!response.ok) {
-         console.error('Ошибка fetch списка:', response.status);
-         return [];
+       // Кэш (localStorage, 24 часа)
+       const cacheKey = 'posts_cache_maxmarshall';
+       const cached = localStorage.getItem(cacheKey);
+       if (cached) {
+         const { data, timestamp } = JSON.parse(cached);
+         if (Date.now() - timestamp < 86400000) return data;
        }
-       const files = await response.json();
 
+       const listUrl = `https://api.github.com/repos/${REPO}/contents/${POSTS_FOLDER}?ref=${BRANCH}`;
+       const response = await fetch(listUrl);
+       if (!response.ok) return [];
+
+       const files = await response.json();
        const posts = [];
+
        for (const file of files) {
          if (file.name.endsWith('.md')) {
            const rawUrl = file.download_url;
@@ -123,163 +148,112 @@ The architecture is now fully defined. This plan ensures that the "child" site r
                const [key, ...value] = line.split(': ');
                if (key) fm[key.trim()] = value.join(': ').trim().replace(/^["']|["']$/g, '');
              });
-             if (fm.target_site === TARGET_SITE) {
+
+             if (fm.target_site === TARGET_SITE || !fm.target_site) {
                posts.push({
                  title: fm.title || 'Без заголовка',
                  description: fm.description || '',
                  date: new Date(fm.date || '2026-01-01'),
                  slug: fm.slug || file.name.replace('.md', ''),
-                 media: fm.media || '',
-                 body: marked.parse(frontmatterMatch[2].trim())  // Markdown → HTML
+                 media: fm.media || '',  // featured image/video
+                 body: marked.parse(frontmatterMatch[2].trim())
                });
              }
            }
          }
        }
-       posts.sort((a, b) => b.date - a.date);  // Новые сверху
+
+       posts.sort((a, b) => b.date - a.date);
+       localStorage.setItem(cacheKey, JSON.stringify({ data: posts, timestamp: Date.now() }));
        return posts;
      }
      ```
-   - Обработка: Если >50 постов — fetch все, но рендерить первые 50 (для главной).
 
-[ ]Подзадача 1.3: Добавить функцию loadSinglePost(slug) (в <script> обоих файлов).
-   - Для детального поста по slug.
-   - Код:
+[ ] **Задача 2.2: Изменения в index.html (Главная Лента)**
+Подзадача 2.2.1: Заменить статический const posts = [...] на динамический рендер.
+   - Найти весь блок // Sample Post Data и массив posts.
+   - Заменить на:
      ```js
-     async function loadSinglePost(slug) {
+     async function renderFeed() {
        const posts = await loadPosts();
-       return posts.find(post => post.slug === slug) || null;
-     }
-     ```
-   - Обработка ошибок: Если не найден — показать "Пост не найден".
-
-[ ]Подзадача 1.4: Кэширование (опционально, добавить в loadPosts).
-   - Использовать localStorage для ежедневного кэша (чтобы не ддосить GitHub).
-   - Код в loadPosts перед fetch:
-     ```js
-     const cacheKey = 'posts_cache';
-     const cached = localStorage.getItem(cacheKey);
-     if (cached) {
-       const { data, timestamp } = JSON.parse(cached);
-       if (Date.now() - timestamp < 86400000) {  // 24 часа
-         return data;
-       }
-     }
-     // ... fetch ...
-     localStorage.setItem(cacheKey, JSON.stringify({ data: posts, timestamp: Date.now() }));
-     ```
-
-[ ] Задача 2: Изменения в index.html (Главная — Лента Постов)
-Подзадача 2.1: Заменить статический блок <script> с const posts = [...] на динамический.
-   - Найти: Строчки с // Sample Post Data const posts = [ ... ] и весь массив.
-   - Заменить на: 
-     ```js
-     async function renderPosts() {
-       const posts = await loadPosts();
-       const feed = document.getElementById('feed-view');  // Предполагаемый ID ленты, если нет — добавить <div id="feed-view"> вокруг карточек
+       const feedContainer = document.querySelector('main > div:first-child');  // Адаптируй под твой контейнер ленты (или добавь id="feed")
        if (posts.length === 0) {
-         feed.innerHTML = '<p class="text-slate-500">Нет постов</p>';
+         feedContainer.innerHTML = '<p>Нет постов</p>';
          return;
        }
 
-       // Рендер первых 50 (или всех, если <50)
-       const limitedPosts = posts.slice(0, 50);
-       feed.innerHTML = limitedPosts.map(post => `
-         <div class="post-card">  <!-- Твой шаблон карточки, адаптируй -->
-           <h2><a href="post.html?slug=${post.slug}" onclick="return false;">${post.title}</a></h2>  <!-- Клик — открыть в post.html -->
+       const limited = posts.slice(0, 50);  // Последние 50
+       feedContainer.innerHTML = limited.map(post => `
+         <!-- Твой шаблон карточки поста из sample, но с динамикой -->
+         <div class="post-card">
+           <h2><a href="/${post.slug}">${post.title}</a></h2>
            <p>${post.description}</p>
-           <small>Дата: ${post.date.toLocaleDateString('ru-RU')}</small>
-           ${post.media ? `<img src="${post.media}" alt="Media">` : ''}
+           ${post.media ? `<img src="${post.media}" alt="">` : ''}
+           <small>${post.date.toLocaleDateString('ru-RU')}</small>
          </div>
        `).join('');
-
-       // Сохранить прокрутку: Если был infinite scroll — добавить IntersectionObserver для подгрузки следующих 50 (если >50).
-       // Пример простого infinite (если нужно):
-       const observer = new IntersectionObserver(entries => {
-         if (entries[0].isIntersecting && limitedPosts.length < posts.length) {
-           // Добавить следующие 50
-         }
-       });
-       observer.observe(document.querySelector('.last-post'));  // Добавь class="last-post" последней карточке
      }
 
-     window.addEventListener('load', renderPosts);
+     window.addEventListener('load', renderFeed);
      ```
-   - Сохранить прокрутку: Если оригинал имел scroll (вероятно, overflow-y: auto) — оставить CSS. Добавить lazy-loading для >50.
+   - Ссылки: href="/${post.slug}" — чистый URL (работает с .htaccess).
 
-[ ]Подзадача 2.2: Добавить обработку клика на пост (для открытия в post.html).
-   - В шаблоне карточки: <a href="post.html?slug=${post.slug}"> (или использовать onclick для hash-routing, если не хочешь отдельную страницу).
-
-[ ]Подзадача 2.3: Добавить loading state.
-   - Перед feed: <p id="loading">Загрузка постов...</p>
+Подзадача 2.2.2: Добавить loading.
+   - В контейнер ленты: <p id="loading">Загрузка постов...</p>
    - В JS: Скрыть после render.
 
-[ ] Задача 3: Изменения в post.html (Детальный Пост)
-[ ]Подзадача 3.1: Заменить статический контент внутри <div class="mb-6"> и <article class="article-content"> на динамический.
-   - Найти: <div class="mb-6"> с <h1> и <p> (title/description).
-   - Заменить на: <div id="post-header" class="mb-6"><p>Загрузка...</p></div>
-   - Найти: <article class="article-content"> с <p>, <h2> и т.д.
-   - Заменить на: <article id="post-content" class="article-content"><p>Загрузка...</p></article>
-   - Убрать статический featured image: Заменить на <div id="featured-image"></div>
+[ ] **Задача 2.3: Изменения в post.html (Единый Шаблон Детального Поста)**
+Подзадача 2.3.1: Заменить статический контент на динамический.
+   - Найти <div class="mb-6"> (title + description) → добавить id="post-header".
+   - Найти featured image div → id="featured-image".
+   - Найти <article class="article-content"> → id="post-body".
+   - Убрать весь статический текст внутри этих блоков (оставь placeholders: "Загрузка...").
 
-[ ]Подзадача 3.2: Добавить JS для fetch по slug из URL.
-   - В <script> в конце <body>:
+Подзадача 2.3.2: Добавить JS для рендера по slug из pathname.
+   - В <script> в конце:
      ```js
-     // Получить slug из URL (?slug=...)
-     const params = new URLSearchParams(window.location.search);
-     const slug = params.get('slug');
+     function getSlug() {
+       return location.pathname.substring(1).split('?')[0];  // /moy-slug → moy-slug
+     }
 
      async function renderPost() {
+       const slug = getSlug();
        if (!slug) {
-         document.getElementById('post-content').innerHTML = '<p>Пост не найден</p>';
+         document.getElementById('post-body').innerHTML = '<p>Пост не найден</p>';
          return;
        }
 
-       const post = await loadSinglePost(slug);
+       const posts = await loadPosts();
+       const post = posts.find(p => p.slug === slug);
        if (!post) {
-         document.getElementById('post-content').innerHTML = '<p>Пост не найден</p>';
+         document.getElementById('post-body').innerHTML = '<p>Пост не найден (404)</p>';
          return;
        }
 
-       // Заголовок и описание
+       // Title страницы + meta
+       document.title = `${post.title} — X-Blog`;
+       document.querySelector('meta[name="description"]').setAttribute('content', post.description);
+
+       // Header
        document.getElementById('post-header').innerHTML = `
-         <h1 class="text-3xl md:text-4xl font-black leading-tight tracking-tight text-slate-900 dark:text-white mb-4">
-           ${post.title}
-         </h1>
-         <p class="text-lg text-slate-500 dark:text-slate-400 font-normal">${post.description}</p>
+         <h1 class="text-3xl md:text-4xl font-black ...">${post.title}</h1>
+         <p class="text-lg ...">${post.description}</p>
        `;
 
-       // Featured image, если есть
+       // Featured
        document.getElementById('featured-image').innerHTML = post.media ? `
-         <div class="w-full aspect-[16/9] rounded-xl bg-center bg-no-repeat bg-cover mb-8 border border-border-dark" style="background-image: url('${post.media}')"></div>
+         <div class="w-full aspect-[16/9] ... " style="background-image: url('${post.media}')"></div>
        ` : '';
 
-       // Контент (HTML из Markdown)
-       document.getElementById('post-content').innerHTML = post.body;
+       // Body
+       document.getElementById('post-body').innerHTML = post.body;
+
+       // Tags/social — если есть в frontmatter, добавить
      }
 
      window.addEventListener('load', renderPost);
      ```
-   - Это заменит только контент — остальная вёрстка (хедер, сайдбар, футер, социальные кнопки) остаётся нетронутой.
 
-[ ]Подзадача 3.3: Добавить кнопку "Назад на главную".
-   - В конец <article>: <button onclick="window.location.href='/'">← На главную</button>
-
-[ ]Подзадача 3.4: Обработка media (фото/видео).
-   - Если media — video URL, рендерить <video src="${post.media}"></video> вместо img.
-
-[ ] Задача 4: Тестирование и Деплой
-[ ]Подзадача 4.1: Тест локально (открыть HTML в браузере).
-   - Создать тестовый пост в Decap с slug='test-post', target_site='maxmarshall'.
-   - Проверить: index.html показывает в ленте; post.html?slug=test-post рендерит детальный.
-
-[ ]Подзадача 4.2: Деплой на хостинг (FTP).
-   - Загрузить обновлённые index.html и post.html.
-   - Проверить URL: maxmarshall.indevs.in/post.html?slug=...
-
-[ ]Подзадача 4.3: Оптимизации.
-   - Rate limits GitHub: Добавить auth token, если частые fetch (headers: { Authorization: 'token YOUR_GITHUB_TOKEN' }).
-   - SEO: Добавить <meta name="description" content="${post.description}"> динамически в JS (document.querySelector('meta[name="description"]').content = ...). 
-
-Этот план полный — реализуй по шагам. Если ошибки — логи в console.
+Подзадача 2.3.3: Кнопка назад.
+   - В конец post-body: `<button onclick="history.back()" class="...">← Назад</button>`
 
