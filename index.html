@@ -324,6 +324,12 @@
             loadPosts().then(posts => {
                 const post = posts.find(p => p.slug === slug);
                 if (post) {
+                    // Скрываем left aside для 2 колонок (контент + right sidebar)
+                    document.querySelector('aside:nth-of-type(1)').classList.add('hidden');  // Left nav скрыт
+                    // Расширяем центр для полноты
+                    document.getElementById('mainContent').classList.remove('max-w-[600px]');
+                    document.getElementById('mainContent').classList.add('max-w-[800px]', 'mx-auto');
+
                     document.getElementById('mainContent').innerHTML = `
                         <div class="sticky top-14 z-40 glass-header border-b border-border-color px-4 py-3">
                             <button onclick="showHome()" class="flex items-center gap-4 text-primary font-bold">
@@ -332,33 +338,33 @@
                             </button>
                         </div>
 
-                        <div class="max-w-[800px] mx-auto px-4 py-8">
+                        <div class="px-4 py-8 max-w-[800px] mx-auto">
                             <!-- Header как в post.html -->
                             <header class="mb-8">
                                 <h1 class="text-3xl md:text-4xl font-black leading-tight tracking-tight mb-4">
                                     ${post.title}
                                 </h1>
-                                <p class="text-lg text-slate-500 dark:text-slate-400 font-normal mb-4">
-                                    ${post.description || post.excerpt}
+                                <p class="text-lg text-slate-500 dark:text-slate-400 font-normal mb-6">
+                                    ${post.description || ''}
                                 </p>
                                 <div class="flex items-center gap-1 mb-4">
                                     <p class="font-bold">Max Marshall</p>
                                     <span class="material-symbols-outlined text-primary text-[16px]">verified</span>
                                 </div>
-                                <p class="text-sm text-slate-500">@max • ${post.time}</p>
+                                <p class="text-sm text-slate-500">@max • ${new Date(post.date).toLocaleDateString('ru-RU')}</p>
                             </header>
 
-                            <!-- Featured image как в post.html -->
-                            ${post.image ? `
-                                <div class="w-full aspect-[16/9] rounded-xl bg-center bg-no-repeat bg-cover mb-8 border border-border-color" style="background-image: url('${post.image}')"></div>
+                            <!-- Featured image как в post.html (background div) -->
+                            ${post.media ? `
+                                <div class="w-full aspect-[16/9] rounded-xl bg-center bg-no-repeat bg-cover mb-8 border border-border-color" style="background-image: url('${post.media}')"></div>
                             ` : ''}
 
-                            <!-- Body -->
-                            <div class="article-content prose prose-invert max-w-none">
+                            <!-- Body как в post.html -->
+                            <div class="article-content prose prose-invert max-w-none prose-headings:font-bold prose-h2:text-2xl prose-p:mb-6 prose-blockquote:border-l-primary prose-blockquote:pl-4 prose-strong:text-white">
                                 ${marked.parse(post.body)}
                             </div>
 
-                            <!-- Кнопка назад внизу -->
+                            <!-- Кнопка назад снизу как в post.html -->
                             <div class="mt-10">
                                 <button onclick="showHome()" class="px-6 py-2 bg-primary text-white font-bold rounded-full hover:bg-primary/90 transition-colors">
                                     ← Назад
@@ -367,12 +373,17 @@
                         </div>
                     `;
                 } else {
-                    document.getElementById('mainContent').innerHTML = '<p class="p-8 text-center text-gray-500">Пост не найден</p>';
+                    document.getElementById('mainContent').innerHTML = '<p class="p-8 text-center text-gray-500">Пост не найден (404)</p>';
                 }
             });
         }
 
         function showHome() {
+            // Восстанавливаем 3 колонки и ширину центра
+            document.querySelector('aside:nth-of-type(1)').classList.remove('hidden');
+            document.getElementById('mainContent').classList.add('max-w-[600px]');
+            document.getElementById('mainContent').classList.remove('max-w-[800px]', 'mx-auto');
+
             location.hash = '';
             renderFeed();
             renderTrending();
