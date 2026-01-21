@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>X-Blog Article View</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Noto+Sans:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1e9cf1",
+                        "background-light": "#f5f7f8",
+                        "background-dark": "#000000",
+                        "sidebar-dark": "#16181c",
+                        "border-dark": "#2f3336",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: "Plus Jakarta Sans", sans-serif;
+        }
+        .article-content p {
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        .article-content h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-200">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-50 flex items-center justify-center border-b border-solid border-border-dark bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md px-4 py-3">
+<div class="flex w-full max-w-[1200px] items-center justify-between">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-primary">
+<div class="size-8">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M42.1739 20.1739L27.8261 5.82609C29.1366 7.13663 28.3989 10.1876 26.2002 13.7654C24.8538 15.9564 22.9595 18.3449 20.6522 20.6522C18.3449 22.9595 15.9564 24.8538 13.7654 26.2002C10.1876 28.3989 7.13663 29.1366 5.82609 27.8261L20.1739 42.1739C21.4845 43.4845 24.5355 42.7467 28.1133 40.548C30.3042 39.2016 32.6927 37.3073 35 35C37.3073 32.6927 39.2016 30.3042 40.548 28.1133C42.7467 24.5355 43.4845 21.4845 42.1739 20.1739Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-xl font-black tracking-tight text-slate-900 dark:text-white">X-Blog</h2>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Home</a>
+<a class="text-sm font-medium hover:text-primary transition-colors text-primary" href="#">Explore</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Notifications</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<label class="hidden sm:flex min-w-40 h-10 max-w-64">
+<div class="flex w-full items-stretch rounded-full bg-slate-200 dark:bg-sidebar-dark border border-transparent focus-within:border-primary focus-within:bg-background-dark transition-all">
+<div class="flex items-center justify-center pl-4 text-slate-500">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="w-full bg-transparent border-none focus:ring-0 text-sm placeholder:text-slate-500 dark:text-white" placeholder="Search X-Blog" type="text"/>
+</div>
+</label>
+<button class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-sidebar-dark transition-colors">
+<span class="material-symbols-outlined text-slate-900 dark:text-white">settings</span>
+</button>
+<div class="size-9 rounded-full bg-cover bg-center border border-border-dark" data-alt="User profile avatar placeholder" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDEOwaBAVIIrCQFTItu_eyCcPYZ5WQ3oWQVGKhMAVqQ93lds8xmQh5hiHXWWtkvR6Xg2P8DTE1k5vMD8Y_Zue_8zmXmtYCmIrIOFVt1EyiraFQnaAPlKk4DCmRood5D3GcDHzPd9HbsVYcsFfx41kg9iydV5ZIeIOZGgThcB224NUdcBOCOqADBPvH5CddPF0ck8UklnJ08-O0XMHNVXKTadrPu9iNRR_VKKb1a3ijWgbvLlPJ-paFedWoaqw7DovF7BLDC3cCZgQ");'></div>
+</div>
+</div>
+</header>
+<main class="flex w-full max-w-[1200px] mx-auto grow px-4 py-6 gap-8">
+<!-- Main Column -->
+<div class="flex flex-col flex-1 max-w-[700px] min-w-0">
+<!-- Breadcrumbs / Back Navigation -->
+<div class="flex items-center gap-4 mb-4">
+<button class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-sidebar-dark transition-colors">
+<span class="material-symbols-outlined text-slate-900 dark:text-white">arrow_back</span>
+</button>
+<div class="flex flex-wrap gap-2 text-sm">
+<a class="text-slate-500 font-medium hover:underline" href="#">Home</a>
+<span class="text-slate-500">/</span>
+<span class="text-slate-900 dark:text-white font-medium">Article</span>
+</div>
+</div>
+<!-- Page Heading -->
+<div class="mb-6">
+<h1 class="text-3xl md:text-4xl font-black leading-tight tracking-tight text-slate-900 dark:text-white mb-4">
+                    Designing for the Modern Web: A Deep Dive into Static Architectures
+                </h1>
+<p class="text-lg text-slate-500 dark:text-slate-400 font-normal">
+                    Exploring the speed, security, and developer experience of SSG in the era of high-performance web applications.
+                </p>
+</div>
+<!-- Author / Metadata (ListItem style) -->
+<div class="flex items-center justify-between border-y border-border-dark py-4 mb-6">
+<div class="flex items-center gap-3">
+<div class="size-12 rounded-full bg-cover bg-center" data-alt="Alex Rivera headshot" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDVu1tcg66zDUHu2Mbs7oS6jzj9oANaqLZuewg_7IWbhBf7GTbxDAEcILDejzp9H3xLVoNIvt908Io7LoD8tYIRii8vLMvBmxd4M9Y4iDVjYhmyK5taVrHZroohOPgmR6MkGIqLTiJWc4BC4WBBFvK2meJ8RfBWIkjJtziFWbUS3DhYO4wkRTjAWs0dKxVsTw16Icvl5XXj6i8ImNcQJunz4C7QV2GEeI6zkxU3fms6dVzz-74x-IwsNBGFSWxhFGeQMoKaI9K5LA");'></div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1">
+<p class="text-slate-900 dark:text-white font-bold leading-tight">Alex Rivera</p>
+<span class="material-symbols-outlined text-primary text-[16px] font-fill">verified</span>
+</div>
+<p class="text-slate-500 text-sm">@arivera • Oct 24 • 8 min read</p>
+</div>
+</div>
+<button class="rounded-full bg-slate-900 dark:bg-white px-5 py-1.5 text-sm font-bold text-white dark:text-black hover:opacity-90 transition-opacity">
+                    Follow
+                </button>
+</div>
+<!-- Featured Image (HeaderImage style) -->
+<div class="w-full aspect-[16/9] rounded-xl bg-center bg-no-repeat bg-cover mb-8 border border-border-dark" data-alt="Modern server architecture abstract visualization" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDhdnCQOuDCPy08JfHddLgD-AY5LVCHHQoVEw4Pn9LfClrNj_-8sEDelhNRZ4ZdI5PFehKADX41Km24JE87kUnd5TM8EdI9JCgTtv0MqoAVLi6zKO2M4J7g_3I7PUONaokGuShIRWk9v_0xRYNNWYeG5tISLJ2QEXy2XDsAWp_KttphAGPXfVIqRx9nAHX2icHnxfLUi8LMyZVghp8ICedQGXBL8WLbn6cZUTU2h6vEBPaXn2nxAzK4am8Fr62z9Mmj8WhaeHqcyw");'>
+</div>
+<!-- Article Content -->
+<article class="article-content text-[17px] text-slate-700 dark:text-slate-300">
+<p>The web is shifting. After a decade of complex client-side rendering dominating the landscape, we are witnessing a renaissance of static architectures. But this isn't the static web of 1995. This is <strong>Static 2.0</strong>—dynamic, personalized, and blazing fast.</p>
+<h2>The Speed Advantage</h2>
+<p>When every millisecond counts, serving pre-rendered HTML from a CDN edge node is the gold standard. By removing the need for server-side processing at request time, static sites achieve Time to First Byte (TTFB) metrics that were previously unthinkable for complex applications.</p>
+<p>Static Site Generators (SSGs) like Astro, Next.js, and Hugo have matured to the point where they can handle massive datasets, partial hydration, and real-time updates through Incremental Static Regeneration (ISR).</p>
+<blockquote class="border-l-4 border-primary pl-6 py-2 my-8 italic text-xl text-slate-900 dark:text-white">
+                    "Static architecture is not about limitations; it's about choosing where you spend your compute cycles."
+                </blockquote>
+<h2>Security by Design</h2>
+<p>Security is the silent winner in the move to static. Without a live database or application server directly exposed to the internet, the attack surface for a static site is virtually non-existent. There is no SQL injection where there is no database query happening on the user's request.</p>
+<p>As we move into 2025, the conversation is no longer about whether to go static, but which flavor of static architecture best suits your content strategy.</p>
+<div class="flex flex-wrap gap-2 mt-10">
+<span class="px-3 py-1 rounded-full bg-slate-200 dark:bg-sidebar-dark text-xs font-medium text-primary hover:bg-primary/10 cursor-pointer">#webdev</span>
+<span class="px-3 py-1 rounded-full bg-slate-200 dark:bg-sidebar-dark text-xs font-medium text-primary hover:bg-primary/10 cursor-pointer">#architecture</span>
+<span class="px-3 py-1 rounded-full bg-slate-200 dark:bg-sidebar-dark text-xs font-medium text-primary hover:bg-primary/10 cursor-pointer">#static</span>
+</div>
+</article>
+<!-- Social Action Bar -->
+<div class="flex items-center justify-between border-y border-border-dark py-3 mt-8">
+<div class="flex items-center gap-12 text-slate-500">
+<button class="flex items-center gap-2 hover:text-primary transition-colors group">
+<span class="material-symbols-outlined p-2 group-hover:bg-primary/10 rounded-full">chat_bubble</span>
+<span class="text-sm">42</span>
+</button>
+<button class="flex items-center gap-2 hover:text-green-500 transition-colors group">
+<span class="material-symbols-outlined p-2 group-hover:bg-green-500/10 rounded-full">repeat</span>
+<span class="text-sm">12</span>
+</button>
+<button class="flex items-center gap-2 hover:text-pink-500 transition-colors group">
+<span class="material-symbols-outlined p-2 group-hover:bg-pink-500/10 rounded-full">favorite</span>
+<span class="text-sm">284</span>
+</button>
+<button class="flex items-center gap-2 hover:text-primary transition-colors group">
+<span class="material-symbols-outlined p-2 group-hover:bg-primary/10 rounded-full">bookmark</span>
+</button>
+</div>
+<button class="p-2 text-slate-500 hover:text-primary hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined">share</span>
+</button>
+</div>
+<!-- Comment Placeholder -->
+<div class="mt-8">
+<div class="flex gap-3">
+<div class="size-10 rounded-full bg-cover bg-center shrink-0" data-alt="User avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDDwiNQH2jmrpeOcKXKPi5AHsWDcYk2WSH3OJ26LuMgpJEkoYPOTQL6TqQGMYqz2NytBBXTscnY3-Dwt3U7Pl7GtKLoLGQ5-n2Gc9X53PFXXxmCB7fdl9KbYbA7m80OBXLCr-J7eTXt-QgRFyr1fMB3mWcSvu1D9fUMLdPr0KkpjZwEocfU5QPonJjdWdQs7esWc4U4eVEy0PbW0VCOYGouZo94iPSTfPool2B_ks0KFv9nanNQjyPVTA4LOeLmxchaCPTuVdeWNQ");'></div>
+<div class="flex-1">
+<textarea class="w-full bg-transparent border-none focus:ring-0 text-lg placeholder:text-slate-500 resize-none px-0 min-h-[100px]" placeholder="Post your reply"></textarea>
+<div class="flex items-center justify-between border-t border-border-dark pt-3">
+<div class="flex gap-1 text-primary">
+<span class="material-symbols-outlined p-2 hover:bg-primary/10 rounded-full cursor-pointer text-[20px]">image</span>
+<span class="material-symbols-outlined p-2 hover:bg-primary/10 rounded-full cursor-pointer text-[20px]">gif_box</span>
+<span class="material-symbols-outlined p-2 hover:bg-primary/10 rounded-full cursor-pointer text-[20px]">sentiment_satisfied</span>
+</div>
+<button class="bg-primary text-white font-bold px-6 py-2 rounded-full hover:bg-primary/90 transition-opacity opacity-50 cursor-not-allowed">
+                                Reply
+                            </button>
+</div>
+</div>
+</div>
+</div>
+<div class="h-40"></div> <!-- Spacer -->
+</div>
+<!-- Right Sidebar -->
+<aside class="hidden lg:flex flex-col w-[350px] gap-4">
+<!-- Trending Card -->
+<div class="rounded-xl bg-slate-100 dark:bg-sidebar-dark overflow-hidden border border-border-dark">
+<h3 class="px-4 py-3 text-xl font-black text-slate-900 dark:text-white">Trending in Blog</h3>
+<div class="flex flex-col cursor-pointer hover:bg-slate-200 dark:hover:bg-white/5 transition-colors px-4 py-3">
+<p class="text-xs text-slate-500">Technology • Trending</p>
+<p class="text-sm font-bold text-slate-900 dark:text-white mt-0.5">#WebDesign2024</p>
+<p class="text-xs text-slate-500 mt-1">12.5K posts</p>
+</div>
+<div class="flex flex-col cursor-pointer hover:bg-slate-200 dark:hover:bg-white/5 transition-colors px-4 py-3">
+<p class="text-xs text-slate-500">Development</p>
+<p class="text-sm font-bold text-slate-900 dark:text-white mt-0.5">Rust vs TypeScript</p>
+<p class="text-xs text-slate-500 mt-1">8,432 posts</p>
+</div>
+<div class="flex flex-col cursor-pointer hover:bg-slate-200 dark:hover:bg-white/5 transition-colors px-4 py-3">
+<p class="text-xs text-slate-500">AI Trends</p>
+<p class="text-sm font-bold text-slate-900 dark:text-white mt-0.5">Edge Intelligence</p>
+<p class="text-xs text-slate-500 mt-1">2,105 posts</p>
+</div>
+<a class="block px-4 py-4 text-primary text-sm hover:bg-slate-200 dark:hover:bg-white/5 transition-colors" href="#">
+                    Show more
+                </a>
+</div>
+<!-- Recommended Authors -->
+<div class="rounded-xl bg-slate-100 dark:bg-sidebar-dark overflow-hidden border border-border-dark">
+<h3 class="px-4 py-3 text-xl font-black text-slate-900 dark:text-white">Who to follow</h3>
+<div class="flex items-center justify-between px-4 py-3 hover:bg-slate-200 dark:hover:bg-white/5 cursor-pointer">
+<div class="flex items-center gap-2">
+<div class="size-10 rounded-full bg-cover bg-center" data-alt="Jordan Lee avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDO49gR6QpNawKBMkBq6cRMKLFqGLTZ-MeLJFB-ADI9CApTUnQmtIvkYAhRwqSYZxkKDUJuwNTtPIVYnqq4xZ2otMBSFUq6HRpEa4wBuepBkGXyySB8MZ6tuuFn6gFniJ9xjwRPzznAmAlQHgfyo14ruD3SR24uUvzYWhITdB-agXib6mTGxmoYm0CbFOXu5JGg3z_lpZay4arTlZfrY7bx5uUgp5hj2xN2RHDGZ0Wb7kd3Y6Z61SHcvWB2f3uFSxJ9ZcASaI5FYw");'></div>
+<div class="flex flex-col">
+<p class="text-sm font-bold dark:text-white leading-tight">Jordan Lee</p>
+<p class="text-xs text-slate-500">@jlee_dev</p>
+</div>
+</div>
+<button class="bg-slate-900 dark:bg-white text-white dark:text-black text-xs font-bold py-1.5 px-4 rounded-full">Follow</button>
+</div>
+<div class="flex items-center justify-between px-4 py-3 hover:bg-slate-200 dark:hover:bg-white/5 cursor-pointer">
+<div class="flex items-center gap-2">
+<div class="size-10 rounded-full bg-cover bg-center" data-alt="Sarah Chen avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCOehBU8BG_OPhl3L_lljmsK5CaztC8u1xKNqlhIFd6GBTCzAV0CqNgk3YC76dfWGK4nqKh-ODGkutassCuJDYXFIk2zy52zYTu-imoNZPl9q4hvP-xiqJiL3I8a8iquDeTJRLBw-u607GdTTRuIJlJ2-TXIa9pajFScCKtxbkEtFl_of3lE8M43KNZPdmzImyc6mcG-GqiwOjNShRDUAZeGjY-9NA31IbSNczlyxlXJhcLNje7QnMvb7ViLXb1tGmsieP6RGYiPw");'></div>
+<div class="flex flex-col">
+<p class="text-sm font-bold dark:text-white leading-tight">Sarah Chen</p>
+<p class="text-xs text-slate-500">@sarah_codes</p>
+</div>
+</div>
+<button class="bg-slate-900 dark:bg-white text-white dark:text-black text-xs font-bold py-1.5 px-4 rounded-full">Follow</button>
+</div>
+<a class="block px-4 py-4 text-primary text-sm hover:bg-slate-200 dark:hover:bg-white/5 transition-colors" href="#">
+                    Show more
+                </a>
+</div>
+<!-- Footer Links -->
+<footer class="px-4 flex flex-wrap gap-x-3 gap-y-1">
+<a class="text-xs text-slate-500 hover:underline" href="#">Terms of Service</a>
+<a class="text-xs text-slate-500 hover:underline" href="#">Privacy Policy</a>
+<a class="text-xs text-slate-500 hover:underline" href="#">Cookie Policy</a>
+<a class="text-xs text-slate-500 hover:underline" href="#">Accessibility</a>
+<a class="text-xs text-slate-500 hover:underline" href="#">Ads info</a>
+<p class="text-xs text-slate-500">© 2026 X-Max Marshall</p>
+</footer>
+</aside>
+</main>
+</div>
+</body></html>
