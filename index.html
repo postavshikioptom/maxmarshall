@@ -324,6 +324,7 @@
             loadPosts().then(posts => {
                 const post = posts.find(p => p.slug === slug);
                 if (post) {
+                    location.hash = `#post/${slug}`;
                     // Скрываем left aside для 2 колонок (контент слева + right trending справа)
                     document.querySelector('aside:first-of-type').classList.add('hidden');
                     // Расширяем центр
