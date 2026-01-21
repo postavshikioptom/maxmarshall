@@ -296,12 +296,13 @@
     }
 
     function getSlug() {
+        // Handle clean URLs like /moy-slug according to architecture
+        const path = location.pathname.substring(1).split('?')[0];
+        if (path && path !== 'post.html' && path !== 'index.html' && path !== '') return path;
+        
+        // Fallback to query params if .htaccess is not working
         const params = new URLSearchParams(window.location.search);
         if (params.has('slug')) return params.get('slug');
-        
-        // Handle cases like /moy-slug if .htaccess is working
-        const path = location.pathname.substring(1).split('?')[0];
-        if (path && path !== 'post.html' && path !== 'index.html') return path;
         
         return null;
     }
